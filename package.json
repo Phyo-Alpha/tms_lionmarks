@@ -5,7 +5,7 @@
   "scripts": {
     "auth:gen": "bun x @better-auth/cli generate --config ./src/server/lib/auth.ts --output ./src/server/db/schema/auth-schema.ts -y",
     "build": "next build --turbopack",
-    "db:gen": "bun run auth:gen && drizzle-kit generate",
+    "db:gen": "drizzle-kit generate",
     "db:latest": "drizzle-kit generate && drizzle-kit migrate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "bun run scripts/seed.ts",

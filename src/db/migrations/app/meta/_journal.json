@@ -8,6 +8,13 @@
       "when": 1762585797520,
       "tag": "0000_mixed_hiroim",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1762590251995,
+      "tag": "0001_open_thunderbird",
+      "breakpoints": true
     }
   ]
 }

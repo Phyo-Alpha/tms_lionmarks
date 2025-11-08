@@ -78,6 +78,12 @@ const app = new Elysia({ prefix: "/api" })
         paths: await OpenAPI.getPaths(),
         tags: [
           { name: "Survey", description: "Survey management endpoints" },
+          { name: "Learners", description: "Learner management endpoints" },
+          { name: "Courses", description: "Course catalog management endpoints" },
+          {
+            name: "Course Registrations",
+            description: "Course registration management endpoints",
+          },
           { name: "Better Auth", description: "Authentication endpoints" },
         ],
         security: [

@@ -119,6 +119,15 @@ sbf/
 - `bun run start` - Start production server
 - `bun run lint` - Run ESLint
 - `bun run docker:dev` - Start Docker services
+- `bun test` - Run unit tests for trainee schemas
+
+### Trainee Management
+
+- Admin users can manage learners at `/admin/learners` with full CRUD, search, status filters, and pagination.
+- Courses are available at `/admin/courses`, supporting scheduling, capacity management, and publication state.
+- Course registrations live at `/admin/registrations`, providing enrolment, conflict detection, and capacity validation.
+- Query parameters for all admin tables are managed with [nuqs](https://github.com/47ng/nuqs) to allow sharable filtered views.
+- Server-side protections prevent double enrolments, enforce course capacity, and block overlapping schedules.
 
 ### Database Management
 
@@ -136,6 +145,11 @@ sbf/
 - **Styling**: Tailwind CSS
 - **Package Manager**: Bun
 - **Authentication**: Better Auth with organization support
+
+### Testing
+
+- Execute `bun test` to run the Bun test suite.
+- Current coverage focuses on trainee management schemas to ensure validation rules remain stable.
 
 ## API Documentation
 
