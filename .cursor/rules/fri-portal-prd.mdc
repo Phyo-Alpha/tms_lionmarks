@@ -1,0 +1,173 @@
+---
+alwaysApply: false
+---
+
+# Future Readiness Index (FRI) Portal - Project Requirements Document
+
+## Project Overview
+
+The Future Readiness Index (FRI) Portal is a comprehensive platform developed for SBF (Singapore Business Federation) to help companies assess their future readiness, benchmark against industry peers, and receive actionable recommendations.
+
+## Core Modules & Requirements
+
+### 1. Landing Page
+
+**Purpose**: Introductory information and credibility signals
+
+- FRI Initiative Overview
+- Login/Registration functionality
+- Benefits explanation
+- Trusted By logos display
+- Testimonials/Case Studies showcase
+
+### 2. Dashboard
+
+**Purpose**: Central hub for company users after login
+
+- FRI Score Display with visual indicators
+- Survey Progress Tracker with completion status
+- Direct link to Report Viewer
+- Notification system for updates
+- Delegation Overview Widget for team management
+- Benchmarking Preview & Overview
+
+### 3. Survey System
+
+**Purpose**: Collects assessment data from organisations
+
+- Dynamic Survey Engine with adaptive questioning
+- Dimension-based sections for structured assessment
+- Sector-specific logic for targeted questions
+- Auto-Save & Resume functionality
+- Tooltips/Instructions for user guidance
+- ACRA Auto-fill with manual override capability
+- Skip Financial Questions option for sensitive data
+
+### 4. Report Viewer
+
+**Purpose**: Visualises results and recommendations
+
+- Interactive Charts (radar, bar, trend visualizations)
+- Online + PDF report generation
+- Personalised recommendations engine
+- Heatmap display (strengths & gaps analysis)
+- Benchmarking (sector, regional, global comparisons)
+- Integration links to Knowledge Hub
+
+### 5. Knowledge Centre
+
+**Purpose**: Resource repository for learning materials
+
+- Filter/Search by sector, dimension, keyword
+- CMS management capabilities (Admin controlled)
+- Toolkits, templates, case studies, and multimedia content
+
+### 6. Support Page
+
+**Purpose**: User assistance and help resources
+
+- FAQ system
+- Contact information and forms
+- Help resources and documentation
+
+### 7. Admin Portal
+
+**Purpose**: Administration and configuration for SBF teams
+
+- User & Company Configuration management
+- Survey Configuration and customization
+- Data Validation Workflow
+- Analytics Dashboard for insights
+- View/Edit Answer History
+- Usage Logs and monitoring
+- Role Definitions & Permissions
+- CMS Management for content
+- Adjust Scoring Logic capabilities
+
+### 8. Reporting Engine
+
+**Purpose**: Automates and standardises outputs
+
+- Auto-generated Reports
+- Recommendation Engine for insights
+- Export Options (multiple formats)
+- Integration with Power BI/Tableau/MS Teams
+
+### 9. Collaboration Features
+
+**Purpose**: Multi-user organizational support
+
+- Single Company Login (Org-based authentication)
+- Nominate Another User functionality
+- Track Contributions across team members
+- Access Rights at Survey Level granularity
+
+### 10. Back-filing Capability
+
+**Purpose**: Historical data integration
+
+- Import past pilot survey data
+- Data migration and validation
+- Historical trend analysis support
+
+## Technical Architecture Requirements
+
+### Authentication & Authorization
+
+- Role-based access control (RBAC)
+- Organization-based user management
+- Secure session management
+- Multi-factor authentication support
+
+### Data Management
+
+- ACRA integration for company data auto-fill
+- Secure data storage and encryption
+- Data validation and integrity checks
+- Audit trail for all data changes
+
+### Performance & Scalability
+
+- Responsive design for all devices
+- Optimized loading times
+- Scalable architecture for growing user base
+- Caching strategies for improved performance
+
+### Integration Requirements
+
+- ACRA API integration
+- Power BI/Tableau connectivity
+- MS Teams integration
+- PDF generation capabilities
+- Email notification system
+
+## Development Standards
+
+### Code Organization
+
+- Modular architecture following the defined modules
+- Clear separation of concerns
+- Reusable component library
+- Consistent naming conventions
+
+### Security Requirements
+
+- Data encryption at rest and in transit
+- Secure API endpoints
+- Input validation and sanitization
+- Regular security audits
+
+### User Experience
+
+- Intuitive navigation
+- Progressive disclosure of information
+- Accessibility compliance (WCAG 2.1)
+- Mobile-first responsive design
+
+## Success Metrics
+
+- User engagement and completion rates
+- Survey completion time optimization
+- Report generation efficiency
+- System uptime and reliability
+- User satisfaction scores

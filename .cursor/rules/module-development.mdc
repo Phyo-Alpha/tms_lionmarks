@@ -1,0 +1,265 @@
+---
+alwaysApply: false
+---
+# FRI Portal Module Development Guidelines
+
+## Survey System Module
+
+### Dynamic Survey Engine Requirements
+
+- Support adaptive questioning based on previous answers
+- Implement sector-specific logic for targeted questions
+- Calculate progress accurately based on completed questions
+- Validate answers according to question requirements
+- Handle skip conditions and branching logic
+- Support multiple question types (multiple choice, text, rating, etc.)
+
+### Auto-Save & Resume Functionality
+
+- Implement debounced auto-save to prevent excessive API calls
+- Save progress at regular intervals (every 2-3 seconds)
+- Handle network failures gracefully with retry logic
+- Allow users to resume from where they left off
+- Clear saved data after successful submission
+- Provide visual feedback for save status
+
+### ACRA Integration
+
+- Auto-fill company data from ACRA API
+- Allow manual override of auto-filled data
+- Cache ACRA data to reduce API calls
+- Handle API failures gracefully
+- Validate ACRA numbers before submission
+- Support batch company data import
+
+## Dashboard Module
+
+### FRI Score Display Requirements
+
+- Show overall FRI score prominently
+- Display dimension-specific scores
+- Include benchmark comparisons (sector, regional, global)
+- Provide visual indicators for score ranges
+- Show score trends over time
+- Allow drill-down into specific dimensions
+
+### Progress Tracker Requirements
+
+- Display survey completion percentage
+- Show number of completed vs total questions
+- Provide visual progress bar
+- Update in real-time as user progresses
+- Link to continue survey functionality
+- Show estimated time to completion
+
+### Notification System
+
+- Display system notifications
+- Show survey reminders
+- Alert for report availability
+- Handle delegation notifications
+- Provide notification preferences
+- Support email notifications
+
+## Report Viewer Module
+
+### Chart Components Requirements
+
+- Implement radar charts for dimension scores
+- Create bar charts for comparisons
+- Support trend line charts for historical data
+- Provide interactive chart features
+- Export charts as images
+- Ensure accessibility compliance
+
+### PDF Generation Requirements
+
+- Generate comprehensive PDF reports
+- Include all charts and visualizations
+- Support custom branding
+- Allow report customization
+- Implement batch PDF generation
+- Provide download progress indicators
+
+### Benchmarking Features
+
+- Compare against sector averages
+- Show regional comparisons
+- Display global benchmarks
+- Highlight strengths and gaps
+- Provide percentile rankings
+- Support custom benchmark groups
+
+## Admin Portal Module
+
+### User Management Requirements
+
+- Manage user accounts and roles
+- Assign company associations
+- Control access permissions
+- Track user activity
+- Handle user invitations
+- Support bulk user operations
+
+### Survey Configuration
+
+- Create and edit survey questions
+- Configure scoring logic
+- Set sector-specific rules
+- Manage question dependencies
+- Version control for surveys
+- A/B testing capabilities
+
+### Analytics Dashboard
+
+- Track system usage metrics
+- Monitor survey completion rates
+- Analyze user engagement
+- Generate usage reports
+- Export analytics data
+- Set up automated reports
+
+## Knowledge Centre Module
+
+### Content Management System
+
+- Create and edit knowledge content
+- Support multiple content types (toolkits, templates, case studies)
+- Organize content by sectors and dimensions
+- Implement content versioning
+- Support rich text editing
+- Handle file uploads and media
+
+### Search and Filtering
+
+- Full-text search across content
+- Filter by sector, dimension, content type
+- Tag-based organization
+- Advanced search capabilities
+- Search result ranking
+- Search analytics
+
+### Content Publishing Workflow
+
+- Draft and review process
+- Approval workflows
+- Scheduled publishing
+- Content expiration
+- Access control per content
+- Content performance tracking
+
+## Collaboration Features
+
+### User Delegation System
+
+- Nominate users for survey completion
+- Set delegation permissions
+- Track delegation status
+- Handle delegation expiration
+- Support delegation chains
+- Audit delegation activities
+
+### Access Rights Management
+
+- Survey-level access control
+- Role-based permissions
+- Temporary access grants
+- Access request workflows
+- Permission inheritance
+- Access audit trails
+
+### Contribution Tracking
+
+- Track user contributions
+- Show completion status
+- Monitor team progress
+- Generate contribution reports
+- Support team analytics
+- Handle contribution conflicts
+
+## Back-filing Capability
+
+### Data Import Requirements
+
+- Support CSV and Excel file imports
+- Validate imported data
+- Map fields to database schema
+- Handle data conflicts
+- Provide import preview
+- Support incremental imports
+
+### Data Migration
+
+- Migrate historical survey data
+- Preserve data integrity
+- Handle schema changes
+- Support rollback operations
+- Validate migrated data
+- Generate migration reports
+
+### Historical Analysis
+
+- Maintain historical data
+- Support trend analysis
+- Compare historical periods
+- Generate historical reports
+- Preserve data lineage
+- Support data archiving
+
+## Error Handling Patterns
+
+### Module-Specific Error Boundaries
+
+- Implement error boundaries for each major module
+- Provide user-friendly error messages
+- Include retry mechanisms
+- Log errors with context
+- Support error reporting
+- Handle offline scenarios
+
+### API Error Handling
+
+- Consistent error response format
+- Proper HTTP status codes
+- Error code standardization
+- User-friendly error messages
+- Error logging and monitoring
+- Graceful degradation
+
+### Data Validation
+
+- Client-side validation
+- Server-side validation
+- Real-time validation feedback
+- Custom validation rules
+- Validation error display
+- Data sanitization
+
+## Performance Considerations
+
+### Module Loading
+
+- Lazy load heavy modules
+- Implement code splitting
+- Optimize bundle sizes
+- Use dynamic imports
+- Cache module resources
+- Monitor loading performance
+
+### Data Management
+
+- Implement proper caching
+- Use pagination for large datasets
+- Optimize database queries
+- Handle data synchronization
+- Implement offline support
+- Monitor data performance
+
+### User Experience
+
+- Provide loading indicators
+- Implement skeleton screens
+- Handle slow network conditions
+- Optimize for mobile devices
+- Ensure accessibility
+- Monitor user interactions

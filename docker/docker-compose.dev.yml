@@ -1,0 +1,41 @@
+name: sbf-dev
+services:
+  postgres:
+    image: postgres:17
+    container_name: "sbf-db"
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-sbf}
+    ports:
+      - "${POSTGRES_PORT:-5458}:5432"
+    env_file:
+      - ../.env
+    volumes:
+      - sbf_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sbf"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: "sbf-timescaledb"
+    restart: always
+    ports:
+      - "${TIMESCALE_PORT:-5459}:5432"
+    environment:
+      POSTGRES_USER: ${TIMESCALE_USER:-timescaledb}
+      POSTGRES_PASSWORD: ${TIMESCALE_PASSWORD:-password}
+      POSTGRES_DB: ${TIMESCALE_DB:-timescaledb}
+    volumes:
+      - sbf_timescaledb_data:/var/lib/postgresql/data
+
+networks:
+  sbf_network:
+
+volumes:
+  sbf_data:
+  sbf_timescaledb_data:

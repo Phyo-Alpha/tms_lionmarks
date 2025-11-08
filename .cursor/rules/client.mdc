@@ -1,0 +1,279 @@
+---
+globs: src/app/**,src/client/**
+alwaysApply: false
+---
+
+## Search Params
+
+- ALWAYS use NUQS for search params
+
+### NUQS
+
+NUQS is a type-safe library for managing URL search parameters in Next.js and React applications.
+
+#### Type-Safe Parsers
+
+Always use parsers for type safety and validation:
+
+```ts
+import { parseAsString, parseAsInteger, parseAsBoolean } from "nuqs";
+
+const [name, setName] = useQueryState("name", parseAsString);
+const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+const [enabled, setEnabled] = useQueryState("enabled", parseAsBoolean);
+```
+
+#### Multiple Query States
+
+Use `useQueryStates` to manage multiple parameters:
+
+```ts
+import { useQueryStates, parseAsString, parseAsInteger } from "nuqs";
+
+const [filters, setFilters] = useQueryStates({
+  search: parseAsString,
+  page: parseAsInteger.withDefault(1),
+  limit: parseAsInteger.withDefault(10),
+});
+
+setFilters({ search: "hello", page: 1 });
+
+setFilters((prev) => ({ ...prev, page: prev.page + 1 }));
+```
+
+#### Parser Options
+
+Customize parser behavior:
+
+```ts
+const [value, setValue] = useQueryState(
+  "key",
+  parseAsString.withDefault("default").withOptions({
+    shallow: false,
+    history: "push",
+    throttleMs: 300,
+    clearOnDefault: true,
+  }),
+);
+```
+
+#### Server-Side Usage
+
+Access query params on the server:
+
+```ts
+import { createSearchParamsCache, parseAsString } from "nuqs/server";
+
+export const searchParamsCache = createSearchParamsCache({
+  q: parseAsString,
+  page: parseAsInteger.withDefault(1),
+});
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const { q, page } = await searchParamsCache.parse(searchParams);
+
+  return <div>Search: {q}</div>;
+}
+```
+
+#### Best Practices
+
+1. **Always use parsers** - Type safety prevents runtime errors
+2. **Use `withDefault`** - Handle missing parameters gracefully
+3. **Group related params** - Use `useQueryStates` for filters
+4. **Use `shallow: false`** - When navigation should trigger re-renders
+5. **Use `history: 'push'`** - For user-initiated navigation
+6. **Throttle updates** - Use `throttleMs` for real-time search
+7. **Clear defaults** - Use `clearOnDefault` to keep URLs clean
+
+## API Rules
+
+### Tanstack Query
+
+- Don't use object destructuring:
+
+```ts
+// DON'T
+const { mutate: login, isPending } = useMutation(authQueries.login());
+// DO
+const login = useMutation(authQueries.login());
+```
+
+- use [eden](/src/client/lib/eden.ts) for api calls:
+
+```ts
+eden["survey-attempt"].get()
+eden.survey.post({...})
+```
+
+### queryOptions Helper
+
+Always use `queryOptions` or `mutationOptions` helper for type safety and reusability:
+
+```ts
+import { queryOptions } from "@tanstack/react-query";
+
+// DON'T - no type checking for typos
+const todosQuery = {
+  queryKey: ["todos"],
+  queryFn: fetchTodos,
+  stallTime: 5000, // typo not caught
+};
+
+// DO - type-safe with queryOptions
+const todosQuery = queryOptions({
+  queryKey: ["todos"],
+  queryFn: fetchTodos,
+  staleTime: 5000,
+});
+```
+
+### Query Factories Pattern
+
+Use Query Factories to organize queries with co-located keys and functions:
+
+```ts
+import { queryOptions } from "@tanstack/react-query";
+
+export const todoQueries = {
+  all: () => ["todos"] as const,
+  lists: () => [...todoQueries.all(), "list"] as const,
+  list: (filters: string) =>
+    queryOptions({
+      queryKey: [...todoQueries.lists(), filters],
+      queryFn: () => fetchTodos(filters),
+    }),
+  details: () => [...todoQueries.all(), "detail"] as const,
+  detail: (id: number) =>
+    queryOptions({
+      queryKey: [...todoQueries.details(), id],
+      queryFn: () => fetchTodo(id),
+      staleTime: 5000,
+    }),
+};
+```
+
+Key principles:
+
+- Mix key-only functions (for hierarchy and invalidation) with full query objects
+- Co-locate `queryKey` and `queryFn` - they depend on each other
+- Use `queryOptions` for full query objects
+- Build hierarchical keys using the factory methods
+
+### Custom Hooks
+
+Avoid creating custom hooks for simple query wrappers:
+
+```ts
+// DON'T - unnecessary abstraction
+const useTodos = () => useQuery(todosQuery);
+
+// DO - use query directly
+const todosQuery = queryOptions({
+  queryKey: ["todos"],
+  queryFn: fetchTodos,
+});
+
+// In component
+const { data } = useQuery(todosQuery);
+```
+
+Only create custom hooks when:
+
+- Additional logic is needed (memoization, transformations)
+- Multiple queries need to be composed
+- Complex state synchronization is required
+
+### Type Safety with Data Tags
+
+Queries created with `queryOptions` automatically tag query keys with return types:
+
+```ts
+const todosQuery = queryOptions({
+  queryKey: ["todos"],
+  queryFn: fetchTodos, // returns Todo[]
+});
+
+// Type is inferred automatically - no manual type parameter needed
+const todos = queryClient.getQueryData(todosQuery.queryKey);
+// ^? const todos: Todo[] | undefined
+
+queryClient.setQueryData(todosQuery.queryKey, newTodos);
+// TypeScript knows newTodos must be Todo[]
+```
+
+### Service File Structure
+
+Organize queries in service files using the Query Factory pattern:
+
+```ts
+// src/client/services/todos.ts
+import { queryOptions } from "@tanstack/react-query";
+import { eden } from "@/client/lib/eden";
+
+export const todoQueries = {
+  all: () => ["todos"] as const,
+  list: (filters: string) =>
+    queryOptions({
+      queryKey: [...todoQueries.all(), "list", filters],
+      queryFn: () => eden.todos.get({ filters }),
+    }),
+  detail: (id: number) =>
+    queryOptions({
+      queryKey: [...todoQueries.all(), "detail", id],
+      queryFn: () => eden.todos[id].get(),
+      staleTime: 5000,
+    }),
+};
+
+// Usage in components
+import { todoQueries } from "@/client/services/todos";
+
+const { data } = useQuery(todoQueries.list("active"));
+```
+
+### Error Handling
+
+- Use `onSuccess` for success handling and `.catch()` for error handling.
+- Avoid using `onError` in the options object.
+
+```ts
+const mutation = useMutation(authQueries.forgotPassword());
+
+mutation
+  .mutateAsync(
+    { email: "test@example.com" },
+    {
+      onSuccess: () => {
+        toast.success("Password reset email sent");
+      },
+    },
+  )
+  .catch((error) => {
+    toast.error(error.message);
+  });
+```
+
+### Form Submissions with Mutations
+
+Always use `await` with `mutateAsync` in form submit handlers, with `onSuccess` in options and `.catch()` for errors:
+
+```ts
+const mutation = useMutation(authQueries.login());
+
+const onSubmit = async (data: FormSchema) => {
+  await mutation
+    .mutateAsync(data, {
+      onSuccess: () => {
+        router.push("/dashboard");
+      },
+    })
+    .catch((error) => {
+      toast.error(error.message);
+    });
+};
+```

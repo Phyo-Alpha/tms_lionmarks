@@ -1,0 +1,153 @@
+---
+alwaysApply: true
+---
+
+# FRI Portal Architecture & Development Patterns
+
+## Technology Stack
+
+Based on the existing codebase structure:
+
+- **Frontend**: Next.js 15+ with App Router
+- **Backend**: Elysia
+- **Database**: PostgreSQL with Drizzle ORM
+- **Authentication**: Better-Auth
+- **Styling**: Tailwind CSS
+- **Package Manager**: Bun (using `ni` commands)
+
+## File Structure Standards
+
+### App Router Structure (`src/app`)
+
+- Use Next.js App Router conventions with route groups
+- `(protected)/` for authenticated routes
+- `(public)/` for public routes
+- `api/` for API endpoints
+- `hooks/` for custom React hooks
+- `lib/` for utility libraries and configurations
+
+### Server Structure (`src/server`)
+
+- `api/` for API endpoint handlers
+- `config/` for environment and configuration
+- `db/` for database schema and connections
+- `lib/` for server-side utilities
+
+### Client Structure (`src/client`)
+
+- `components/` for shared components
+- `hooks/` for **reusable** custom React hooks
+- `lib/` for utility libraries and configurations
+- `services/` for API calls abstracted with Tanstack Query
+
+## State Management Patterns
+
+### 1. Server State
+
+- Use appropriate data fetching libraries (React Query/SWR)
+- Implement proper caching strategies
+- Handle loading and error states
+- Optimize for performance with stale-while-revalidate patterns
+
+### 2. Client State
+
+- Use appropriate state management for UI state
+- Keep form data in local state
+- Implement proper state synchronization
+- Consider state persistence needs
+
+## Performance Optimization
+
+### 1. Code Splitting
+
+- Lazy load heavy components
+- Split routes appropriately
+- Optimize bundle sizes
+- Use dynamic imports strategically
+
+### 2. Data Fetching Optimization
+
+- Implement pagination for large datasets
+- Use proper caching strategies
+- Optimize database queries
+- Consider data prefetching
+
+## Development Workflow
+
+### Feature Development
+
+1. Create feature branch from `develop`
+2. Implement module following established patterns
+3. Add comprehensive tests
+4. Update documentation
+5. Create pull request with clear description
+
+### Feature structuring
+
+- Back-end endpoints: a service folder in `src/server/api/`
+- Front-end: a folder in `src/app/` with it's components colocated with `page.tsx`
+- API calls: are done with Tanstack Query in `src/client/services/`
+
+### Code Review Checklist
+
+- [ ] Follows established patterns
+- [ ] Includes proper error handling
+- [ ] Updates documentation if needed
+- [ ] Follows security best practices
+- [ ] Optimized for performance
+- [ ] Follows [rules](/.cursor/rules)
+
+## Code Quality Standards
+
+### TypeScript Configuration
+
+- Enable strict type checking
+- No implicit any types
+- No implicit returns
+- No unused locals/parameters
+- Proper type definitions
+- JSDoc documentation
+
+### Naming Conventions
+
+- Use kebab-case for all files
+- Use camelCase for variable names
+- Use snake_case for database column names
+- Use snake_case for database table names
+- Use PascalCase for components and classes
+- Use camelCase for function names
+
+## Security Best Practices
+
+### Input Validation
+
+- Validate all user inputs
+- Use zod schema validation
+- Sanitize data before storage
+- Handle file uploads securely
+- Prevent injection attacks
+
+## Documentation Standards
+
+### Code Comments
+
+- Don't use inline code comments, unless requested and needed.
+- Use JSDoc for function and class comments, explain the why not the what.
+
+### API Documentation
+
+- Document all API endpoints
+- Include request/response examples
+- Document error codes and messages
+- Include authentication requirements
+- Keep documentation up to date
+- Use OpenAPI/Swagger specifications
+
+### Component Documentation
+
+- Document component props and usage
+- Include usage examples
+- Document component behavior
+- Include accessibility notes
+- Keep documentation current
+- Use Storybook for component docs
