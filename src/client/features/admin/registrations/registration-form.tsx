@@ -21,22 +21,31 @@ const registrationFormSchema = z
     registeredAt: z.date().nullable().optional(),
     completedAt: z.date().nullable().optional(),
     score: z
-      .union([z.string(), z.number()])
-      .optional()
-      .transform((value) => {
-        if (value === "" || value === undefined) return undefined;
-        const numeric = typeof value === "string" ? Number(value) : value;
-        return Number.isFinite(numeric) ? numeric : undefined;
+      .string()
+      .or(z.number())
+      .or(z.null())
+      .or(z.undefined())
+      .refine(
+        (val) => {
+          if (val === "" || val === null || val === undefined) return true;
+          const num = typeof val === "string" ? Number(val) : val;
+          return Number.isFinite(num) && num >= 0 && num <= 100 && Number.isInteger(num);
+        },
+        { message: "Score must be a number between 0 and 100" },
+      )
+      .transform((val) => {
+        if (val === "" || val === null || val === undefined) return undefined;
+        const num = typeof val === "string" ? Number(val) : val;
+        return Number.isFinite(num) ? num : undefined;
       })
-      .pipe(
-        z
-          .number({ invalid_type_error: "Score must be a number" })
-          .int("Score must be a whole number")
-          .min(0, "Score must be at least 0")
-          .max(100, "Score must be at most 100")
-          .optional(),
-      ),
-    certificateUrl: z.string().url("Provide a valid URL").optional(),
+      .pipe(z.number().int().min(0).max(100).optional()),
+    certificateUrl: z
+      .string()
+      .refine((val) => val === "" || z.string().url().safeParse(val).success, {
+        message: "Provide a valid URL",
+      })
+      .transform((val) => (val === "" ? undefined : val))
+      .pipe(z.string().url().optional()),
     notes: z.string().optional(),
   })
   .superRefine((values, ctx) => {
@@ -94,8 +103,8 @@ export function RegistrationForm({
   submitLabel = "Save registration",
   courseMeta,
 }: RegistrationFormProps) {
-  const form = useForm<RegistrationFormValues>({
-    resolver: zodResolver(registrationFormSchema),
+  const form = useForm({
+    resolver: zodResolver(registrationFormSchema) as any,
     defaultValues: {
       ...defaultValues,
       ...initialValues,
@@ -119,13 +128,14 @@ export function RegistrationForm({
     });
   }, [form, initialValues]);
 
-  const handleSubmit = async (values: RegistrationFormValues) => {
+  const handleSubmit = async (values: unknown) => {
+    const validated = registrationFormSchema.parse(values) as RegistrationFormValues;
     await onSubmit({
-      ...values,
-      registeredAt: values.registeredAt ?? undefined,
-      completedAt: values.completedAt ?? undefined,
-      certificateUrl: values.certificateUrl?.trim() || undefined,
-      notes: values.notes?.trim() || undefined,
+      ...validated,
+      registeredAt: validated.registeredAt ?? undefined,
+      completedAt: validated.completedAt ?? undefined,
+      certificateUrl: validated.certificateUrl?.trim() || undefined,
+      notes: validated.notes?.trim() || undefined,
     });
   };
 
@@ -147,14 +157,12 @@ export function RegistrationForm({
             label="Learner"
             control={form.control}
             items={learners}
-            placeholder="Select learner"
           />
           <FormSelect
             name="courseId"
             label="Course"
             control={form.control}
             items={courses}
-            placeholder="Select course"
           />
         </div>
         <FormSelect

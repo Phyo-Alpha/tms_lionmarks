@@ -23,6 +23,12 @@ export async function callAcraAPI<T = unknown>(
   endpoint: string,
   options: RequestInit = {},
 ): Promise<T> {
+  if (!env.ACRA_API_URL) {
+    throw new Error("ACRA_API_URL environment variable is not set");
+  }
+  if (!env.ACRA_API_TOKEN) {
+    throw new Error("ACRA_API_TOKEN environment variable is not set");
+  }
   const acraUrl = `${env.ACRA_API_URL}${endpoint}`;
 
   const headers = {

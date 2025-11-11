@@ -21,7 +21,7 @@ const FormDatePicker = ({
   disabled,
   ...props
 }: FormDatePickerProps & {
-  ref: React.RefObject<HTMLDivElement>;
+  ref?: React.RefObject<HTMLDivElement>;
 }) => {
   return (
     <FormFieldItem {...props} ref={ref}>

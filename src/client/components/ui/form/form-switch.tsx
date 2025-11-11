@@ -15,7 +15,7 @@ const FormSwitch = ({
   itemRef,
   ...props
 }: FormSwitchProps & {
-  ref: React.RefObject<HTMLDivElement>;
+  ref?: React.RefObject<HTMLDivElement>;
 }) => {
   return (
     <FormFieldItem {...props} ref={ref}>

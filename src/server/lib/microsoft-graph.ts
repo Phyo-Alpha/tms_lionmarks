@@ -74,6 +74,15 @@ function extractUserEmailFromEndpoint(endpoint: string): string | null {
  * This uses application authentication (service account) instead of delegated auth
  */
 export async function getMicrosoftGraphApplicationToken(): Promise<string> {
+  if (!env.MICROSOFT_GRAPH_TENANT_ID) {
+    throw new Error("MICROSOFT_GRAPH_TENANT_ID environment variable is not set");
+  }
+  if (!env.MICROSOFT_GRAPH_CLIENT_ID) {
+    throw new Error("MICROSOFT_GRAPH_CLIENT_ID environment variable is not set");
+  }
+  if (!env.MICROSOFT_GRAPH_CLIENT_SECRET) {
+    throw new Error("MICROSOFT_GRAPH_CLIENT_SECRET environment variable is not set");
+  }
   // Check if cached token is still valid (with 5 minute buffer)
   if (cachedToken && cachedToken.expiresAt > new Date(Date.now() + 5 * 60 * 1000)) {
     return cachedToken.accessToken;

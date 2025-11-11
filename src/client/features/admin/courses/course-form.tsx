@@ -20,27 +20,31 @@ const courseFormSchema = z
       .regex(/^[A-Za-z0-9\-]+$/, "Use letters, numbers, or dashes"),
     title: z.string().min(3, "Title is required"),
     description: z.string().optional(),
-    durationHours: z
-      .union([z.string(), z.number()])
-      .transform((val) => (typeof val === "string" ? Number(val) : val))
-      .pipe(z.number().int("Duration must be a whole number").min(0, "Duration must be >= 0")),
+    durationHours: z.coerce
+      .number()
+      .int("Duration must be a whole number")
+      .min(0, "Duration must be >= 0"),
     startDate: z.date().nullable().optional(),
     endDate: z.date().nullable().optional(),
     capacity: z
-      .union([z.string(), z.number()])
-      .optional()
+      .string()
+      .or(z.number())
+      .or(z.null())
+      .or(z.undefined())
+      .refine(
+        (val) => {
+          if (val === "" || val === null || val === undefined) return true;
+          const num = typeof val === "string" ? Number(val) : val;
+          return Number.isFinite(num) && num > 0 && Number.isInteger(num);
+        },
+        { message: "Capacity must be a positive whole number" },
+      )
       .transform((val) => {
-        if (val === "" || val === undefined) return undefined;
-        const numeric = typeof val === "string" ? Number(val) : val;
-        return Number.isFinite(numeric) ? numeric : undefined;
+        if (val === "" || val === null || val === undefined) return undefined;
+        const num = typeof val === "string" ? Number(val) : val;
+        return Number.isFinite(num) ? num : undefined;
       })
-      .pipe(
-        z
-          .number({ invalid_type_error: "Capacity must be a number" })
-          .int("Capacity must be a whole number")
-          .positive("Capacity must be greater than zero")
-          .optional(),
-      ),
+      .pipe(z.number().int().positive().optional()),
     isPublished: z.boolean(),
   })
   .superRefine((values, ctx) => {
@@ -79,8 +83,8 @@ export function CourseForm({
   onCancel,
   submitLabel = "Save course",
 }: CourseFormProps) {
-  const form = useForm<CourseFormValues>({
-    resolver: zodResolver(courseFormSchema),
+  const form = useForm({
+    resolver: zodResolver(courseFormSchema) as any,
     defaultValues: {
       ...defaultValues,
       ...initialValues,
@@ -110,14 +114,15 @@ export function CourseForm({
     });
   }, [form, initialValues]);
 
-  const handleSubmit = async (values: CourseFormValues) => {
+  const handleSubmit = async (values: unknown) => {
+    const validated = courseFormSchema.parse(values) as CourseFormValues;
     await onSubmit({
-      ...values,
-      code: values.code.toUpperCase(),
-      description: values.description?.trim() || undefined,
-      capacity: values.capacity ?? undefined,
-      startDate: values.startDate ?? undefined,
-      endDate: values.endDate ?? undefined,
+      ...validated,
+      code: validated.code.toUpperCase(),
+      description: validated.description?.trim() || undefined,
+      capacity: validated.capacity ?? undefined,
+      startDate: validated.startDate ?? undefined,
+      endDate: validated.endDate ?? undefined,
     });
   };
 
@@ -158,7 +163,12 @@ export function CourseForm({
         </div>
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           {onCancel && (
-            <Button type="button" variant="ghost" onClick={onCancel} disabled={form.formState.isSubmitting}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onCancel}
+              disabled={form.formState.isSubmitting}
+            >
               Cancel
             </Button>
           )}
