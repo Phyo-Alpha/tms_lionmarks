@@ -23,7 +23,7 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <Button
-            variant="default"
+            variant="outline"
             {...props}
             className={cn(
               "w-full justify-between rounded-xl text-left font-normal",

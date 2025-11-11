@@ -66,9 +66,10 @@ export default function LoginPasswordPage() {
     setPasswordError("");
     await login
       .mutateAsync(data, {
+        // TODO: handle for different type of roles when it is time for it
         onSuccess: () => {
           toast.success("Login Successful. Redirecting to dashboard ...");
-          router.push("/dashboard");
+          router.push("/admin");
         },
       })
       .catch((err) => {
