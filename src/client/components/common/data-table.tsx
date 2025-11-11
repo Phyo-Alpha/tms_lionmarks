@@ -160,12 +160,12 @@ function DataTable<TData>({
     viewMore?.style === "outline"
       ? {
           variant: "outline",
-          size: "2xl",
+          size: "xl",
           rounded: "sm",
         }
       : {
           variant: "default",
-          size: "2xl",
+          size: "xl",
           rounded: "sm",
         };
 
