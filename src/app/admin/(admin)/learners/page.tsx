@@ -23,32 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/client/components/ui/dialog";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@/client/components/ui/empty";
 import { Input } from "@/client/components/ui/input";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationEllipsis,
-} from "@/client/components/ui/pagination";
-import { Spinner } from "@/client/components/ui/spinner";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/client/components/ui/table";
 import {
   Select,
   SelectContent,
@@ -57,6 +32,13 @@ import {
   SelectValue,
 } from "@/client/components/ui/select";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  type ColumnDef,
+} from "@tanstack/react-table";
 import dayjs from "dayjs";
 import { toast } from "sonner";
 
@@ -67,7 +49,13 @@ import {
   type LearnerListParams,
   type LearnerUpdateInput,
 } from "@/client/services/learners";
+import { eden } from "@/client/lib/eden";
 import { LearnerForm, type LearnerFormValues } from "@/client/features/admin/learners";
+import DataTable from "@/client/components/common/data-table";
+import { Page } from "@/client/components/layout/page";
+import { Typography } from "@/client/components/common/typography";
+import { Stack } from "@/client/components/layout/stack";
+import { Row } from "@/client/components/layout/row";
 
 const STATUSES = [
   { label: "All statuses", value: "all" },
@@ -130,19 +118,123 @@ export default function LearnersPage() {
 
   const updateLearnerMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: LearnerUpdateInput }) => {
-      const mutation = learnerQueries.update(id);
-      return mutation.mutationFn(data);
+      return eden.admin.learners({ id }).patch(data);
     },
   });
 
   const deleteLearnerMutation = useMutation({
-    mutationFn: (id: string) => learnerQueries.remove().mutationFn(id),
+    mutationFn: async (id: string) => {
+      return eden.admin.learners({ id }).delete();
+    },
   });
 
   const learners = learnersQuery.data?.data ?? [];
   const pagination = learnersQuery.data?.pagination;
-  const totalPages = pagination?.totalPages ?? 1;
-  const currentPage = pagination?.page ?? normalizedFilters.page ?? 1;
+  const totalCount = pagination?.totalItems ?? 0;
+
+  const columns = useMemo<ColumnDef<LearnerEntity>[]>(
+    () => [
+      {
+        accessorKey: "name",
+        header: "Name",
+        cell: ({ row }) => {
+          const learner = row.original;
+          return (
+            <div className="flex flex-col">
+              <span className="font-medium">
+                {learner.firstName} {learner.lastName}
+              </span>
+              {learner.phone && (
+                <span className="text-xs text-muted-foreground">{learner.phone}</span>
+              )}
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "email",
+        header: "Email",
+        cell: ({ row }) => <span className="max-w-[220px] truncate">{row.original.email}</span>,
+      },
+      {
+        accessorKey: "organization",
+        header: "Organization",
+        cell: ({ row }) => {
+          const org = row.original.organization;
+          return org ? (
+            <span className="max-w-[200px] truncate">{org}</span>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          );
+        },
+      },
+      {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => {
+          const status = row.original.status;
+          return <Badge variant={statusBadgeVariant[status]}>{status.replace("_", " ")}</Badge>;
+        },
+      },
+      {
+        accessorKey: "createdAt",
+        header: "Created",
+        cell: ({ row }) => dayjs(row.original.createdAt).format("DD MMM YYYY"),
+      },
+      {
+        id: "actions",
+        header: () => <div className="text-right">Actions</div>,
+        cell: ({ row }) => {
+          const learner = row.original;
+          return (
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={() => setEditingLearner(learner)}>
+                Edit
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-destructive hover:text-destructive"
+                onClick={() => setDeleteTarget(learner)}
+              >
+                Delete
+              </Button>
+            </div>
+          );
+        },
+      },
+    ],
+    [],
+  );
+
+  const table = useReactTable({
+    data: learners,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: true,
+    pageCount: pagination?.totalPages ?? 1,
+    state: {
+      pagination: {
+        pageIndex: (normalizedFilters.page ?? 1) - 1,
+        pageSize: normalizedFilters.limit ?? 10,
+      },
+    },
+    onPaginationChange: (updater) => {
+      const newPagination =
+        typeof updater === "function"
+          ? updater({
+              pageIndex: (normalizedFilters.page ?? 1) - 1,
+              pageSize: normalizedFilters.limit ?? 10,
+            })
+          : updater;
+      setFilters({
+        page: newPagination.pageIndex + 1,
+        limit: newPagination.pageSize,
+      });
+    },
+  });
 
   const handleCreateLearner = async (values: LearnerFormValues) => {
     await createLearnerMutation
@@ -196,284 +288,118 @@ export default function LearnersPage() {
       });
   };
 
-  const handlePageChange = (page: number) => {
-    setFilters({ page });
-  };
-
   const selectedStatus =
     filters.status && STATUSES.some((item) => item.value === filters.status)
       ? filters.status
       : "all";
 
+  const emptyStateComponent = (
+    <div className="flex flex-col items-center gap-4 py-8">
+      <p className="text-muted-foreground text-sm">No learners yet</p>
+      <p className="text-muted-foreground text-sm">
+        Get started by adding a learner or adjusting your filters.
+      </p>
+      <Button onClick={() => setIsCreateOpen(true)}>Create learner</Button>
+    </div>
+  );
+
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground">Learners</h1>
-        <p className="text-muted-foreground max-w-2xl text-sm">
-          Maintain learner profiles, update contact details, and keep track of enrolment-ready
-          trainees.
-        </p>
-      </header>
+    <Page className="mx-auto w-full max-w-7xl p-6 lg:p-8">
+      <Stack>
+        <div className="flex flex-col gap-2">
+          <Typography.H1>Learners</Typography.H1>
+          <p className="text-muted-foreground max-w-2xl text-sm">
+            Maintain learner profiles, update contact details, and keep track of enrolment-ready
+            trainees.
+          </p>
+        </div>
 
-      <div className="flex flex-col gap-4 rounded-lg border bg-background p-4 shadow-sm">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-1 flex-wrap items-center gap-3">
-            <Input
-              className="max-w-xs"
-              value={filters.search ?? ""}
-              placeholder="Search by name, email, or organization"
-              onChange={(event) =>
-                setFilters({
-                  search: event.target.value ? event.target.value : undefined,
-                  page: 1,
-                })
-              }
-            />
-            <Select
-              value={selectedStatus}
-              onValueChange={(value) => {
-                setFilters({
-                  status: value === "all" ? undefined : value,
-                  page: 1,
-                });
-              }}
-            >
-              <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                {STATUSES.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select
-              value={String(filters.limit ?? 10)}
-              onValueChange={(value) => {
-                setFilters({
-                  limit: Number(value),
-                  page: 1,
-                });
-              }}
-            >
-              <SelectTrigger className="w-[120px]">
-                <SelectValue placeholder="Rows" />
-              </SelectTrigger>
-              <SelectContent>
-                {LIMIT_OPTIONS.map((option) => (
-                  <SelectItem key={option} value={String(option)}>
-                    {option} / page
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-            <DialogTrigger asChild>
-              <Button>Create learner</Button>
-            </DialogTrigger>
-            <DialogContent className="max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Add learner</DialogTitle>
-                <DialogDescription>
-                  Provide basic profile details. Learners can be enrolled into courses after
-                  creation.
-                </DialogDescription>
-              </DialogHeader>
-              <LearnerForm
-                onSubmit={handleCreateLearner}
-                onCancel={() => setIsCreateOpen(false)}
-                submitLabel={createLearnerMutation.isPending ? "Creating…" : "Create learner"}
+        <div className="flex flex-col gap-4 rounded-lg border bg-background p-4 shadow-sm">
+          <Row gap="between" className="flex-wrap">
+            <Row className="flex-1 flex-wrap gap-3">
+              <Input
+                className="max-w-xs"
+                value={filters.search ?? ""}
+                placeholder="Search by name, email, or organization"
+                onChange={(event) =>
+                  setFilters({
+                    search: event.target.value ? event.target.value : undefined,
+                    page: 1,
+                  })
+                }
               />
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Organization</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {learnersQuery.isLoading && (
-                <TableRow>
-                  <TableCell colSpan={6} className="py-12 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <Spinner className="size-6" />
-                      <p className="text-sm text-muted-foreground">Loading learners…</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-
-              {learnersQuery.isError && (
-                <TableRow>
-                  <TableCell colSpan={6} className="py-12">
-                    <Empty className="border-0">
-                      <EmptyHeader>
-                        <EmptyTitle>Unable to load learners</EmptyTitle>
-                        <EmptyDescription className="max-w-sm">
-                          {(learnersQuery.error as Error).message ??
-                            "Please try again in a moment."}
-                        </EmptyDescription>
-                      </EmptyHeader>
-                    </Empty>
-                  </TableCell>
-                </TableRow>
-              )}
-
-              {!learnersQuery.isLoading && !learnersQuery.isError && learners.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} className="py-12">
-                    <Empty className="border-0">
-                      <EmptyHeader>
-                        <EmptyTitle>No learners yet</EmptyTitle>
-                        <EmptyDescription>
-                          Get started by adding a learner or adjusting your filters.
-                        </EmptyDescription>
-                      </EmptyHeader>
-                      <EmptyContent>
-                        <Button onClick={() => setIsCreateOpen(true)}>Create learner</Button>
-                      </EmptyContent>
-                    </Empty>
-                  </TableCell>
-                </TableRow>
-              )}
-
-              {learners.map((learner) => (
-                <TableRow key={learner.id}>
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-medium">
-                        {learner.firstName} {learner.lastName}
-                      </span>
-                      {learner.phone && (
-                        <span className="text-xs text-muted-foreground">{learner.phone}</span>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="max-w-[220px] truncate">{learner.email}</TableCell>
-                  <TableCell className="max-w-[200px] truncate">
-                    {learner.organization ?? <span className="text-muted-foreground">—</span>}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={statusBadgeVariant[learner.status]}>
-                      {learner.status.replace("_", " ")}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{dayjs(learner.createdAt).format("DD MMM YYYY")}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEditingLearner(learner)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => setDeleteTarget(learner)}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-
-        {totalPages > 1 && (
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  aria-disabled={currentPage <= 1}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    if (currentPage > 1) {
-                      handlePageChange(currentPage - 1);
-                    }
-                  }}
+              <Select
+                value={selectedStatus}
+                onValueChange={(value) => {
+                  setFilters({
+                    status: value === "all" ? undefined : value,
+                    page: 1,
+                  });
+                }}
+              >
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {STATUSES.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={String(filters.limit ?? 10)}
+                onValueChange={(value) => {
+                  setFilters({
+                    limit: Number(value),
+                    page: 1,
+                  });
+                }}
+              >
+                <SelectTrigger className="w-[120px]">
+                  <SelectValue placeholder="Rows" />
+                </SelectTrigger>
+                <SelectContent>
+                  {LIMIT_OPTIONS.map((option) => (
+                    <SelectItem key={option} value={String(option)}>
+                      {option} / page
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Row>
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+              <DialogTrigger asChild>
+                <Button>Create learner</Button>
+              </DialogTrigger>
+              <DialogContent className="max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Add learner</DialogTitle>
+                  <DialogDescription>
+                    Provide basic profile details. Learners can be enrolled into courses after
+                    creation.
+                  </DialogDescription>
+                </DialogHeader>
+                <LearnerForm
+                  onSubmit={handleCreateLearner}
+                  onCancel={() => setIsCreateOpen(false)}
+                  submitLabel={createLearnerMutation.isPending ? "Creating…" : "Create learner"}
                 />
-              </PaginationItem>
-              {(() => {
-                const windowSize = 2;
-                const start = Math.max(1, currentPage - windowSize);
-                const end = Math.min(totalPages, currentPage + windowSize);
-                const items: Array<number | "ellipsis-start" | "ellipsis-end"> = [];
+              </DialogContent>
+            </Dialog>
+          </Row>
 
-                if (start > 1) {
-                  items.push(1);
-                  if (start > 2) items.push("ellipsis-start");
-                }
-
-                for (let page = start; page <= end; page += 1) {
-                  items.push(page);
-                }
-
-                if (end < totalPages) {
-                  if (end < totalPages - 1) items.push("ellipsis-end");
-                  items.push(totalPages);
-                }
-
-                return items.map((item, index) => {
-                  if (item === "ellipsis-start" || item === "ellipsis-end") {
-                    return (
-                      <PaginationItem key={`${item}-${index}`}>
-                        <PaginationEllipsis />
-                      </PaginationItem>
-                    );
-                  }
-
-                  const pageNumber = item;
-                  const isActive = pageNumber === currentPage;
-                  return (
-                    <PaginationItem key={pageNumber}>
-                      <PaginationLink
-                        href="#"
-                        isActive={isActive}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          handlePageChange(pageNumber);
-                        }}
-                      >
-                        {pageNumber}
-                      </PaginationLink>
-                    </PaginationItem>
-                  );
-                });
-              })()}
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  aria-disabled={currentPage >= totalPages}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    if (currentPage < totalPages) {
-                      handlePageChange(currentPage + 1);
-                    }
-                  }}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        )}
-      </div>
+          <DataTable
+            table={table}
+            isLoading={learnersQuery.isLoading}
+            emptyStateComponent={emptyStateComponent}
+            emptyStateText="No learners found."
+            showPagination={true}
+            dataCount={totalCount}
+          />
+        </div>
+      </Stack>
 
       <Dialog
         open={Boolean(editingLearner)}
@@ -536,6 +462,6 @@ export default function LearnersPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </Page>
   );
 }

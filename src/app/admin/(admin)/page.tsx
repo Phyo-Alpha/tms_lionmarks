@@ -21,7 +21,7 @@ const quickLinks = [
 
 export default function AdminPage() {
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 p-6 lg:p-8">
       <header className="space-y-2">
         <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
           Trainee management

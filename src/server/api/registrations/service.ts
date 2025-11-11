@@ -3,6 +3,8 @@ import type { Database } from "@/server/api";
 import { course, courseRegistration } from "@/server/db/schema/trainee-schema";
 import type { RegistrationModel } from "./model";
 import { status } from "@/server/helpers/responseWrapper";
+import { RegistrationModel as Model } from "./model";
+import { z } from "zod";
 
 type RegistrationStatus = "enrolled" | "in_progress" | "completed" | "withdrawn";
 
@@ -71,7 +73,7 @@ export abstract class RegistrationService {
     const totalPages = Math.ceil(totalItems / limit) || 1;
 
     return {
-      data,
+      data: data as z.infer<typeof Model.entity>[],
       pagination: {
         page,
         limit,
@@ -112,7 +114,7 @@ export abstract class RegistrationService {
       throw status("Not Found", { message: "Course registration not found" });
     }
 
-    return record;
+    return record as z.infer<typeof Model.entity>;
   }
 
   static async create(db: Database, payload: RegistrationModel.CreateBody) {

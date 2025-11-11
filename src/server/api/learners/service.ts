@@ -3,6 +3,8 @@ import type { Database } from "@/server/api";
 import { learner, courseRegistration } from "@/server/db/schema/trainee-schema";
 import type { LearnerModel } from "./model";
 import { status } from "@/server/helpers/responseWrapper";
+import { LearnerModel as Model } from "./model";
+import { z } from "zod";
 
 export abstract class LearnerService {
   static async list(db: Database, query: LearnerModel.ListQuery) {
@@ -26,8 +28,7 @@ export abstract class LearnerService {
       filters.push(eq(learner.status, learnerStatus));
     }
 
-    const whereClause =
-      filters.length > 0 ? and(...filters) : undefined;
+    const whereClause = filters.length > 0 ? and(...filters) : undefined;
 
     const sortColumn = {
       createdAt: learner.createdAt,
@@ -37,39 +38,28 @@ export abstract class LearnerService {
 
     const orderBy = order === "asc" ? asc(sortColumn) : desc(sortColumn);
 
-    let dataQuery = db
-      .select({
-        ...learner,
-      })
-      .from(learner)
-      .limit(limit)
-      .offset(offset)
-      .orderBy(orderBy);
+    const dataQuery = whereClause
+      ? db.select().from(learner).where(whereClause).limit(limit).offset(offset).orderBy(orderBy)
+      : db.select().from(learner).limit(limit).offset(offset).orderBy(orderBy);
 
-    let countQuery = db.select({ value: count() }).from(learner);
+    const countQuery = whereClause
+      ? db.select({ value: count() }).from(learner).where(whereClause)
+      : db.select({ value: count() }).from(learner);
 
-    if (whereClause) {
-      dataQuery = dataQuery.where(whereClause);
-      countQuery = countQuery.where(whereClause);
-    }
-
-    const [data, totalResult] = await Promise.all([
-      dataQuery,
-      countQuery,
-    ]);
+    const [data, totalResult] = await Promise.all([dataQuery, countQuery]);
 
     const totalItems = totalResult[0]?.value ?? 0;
     const totalPages = Math.ceil(totalItems / limit) || 1;
 
     return {
-      data,
+      data: data as z.infer<typeof Model.entity>[],
       pagination: {
         page,
         limit,
         totalItems,
         totalPages,
       },
-    };
+    } satisfies z.infer<typeof Model.listResponse>;
   }
 
   static async getById(db: Database, id: string) {
@@ -84,7 +74,7 @@ export abstract class LearnerService {
       throw status("Not Found", { message: "Learner not found" });
     }
 
-    return record;
+    return record as z.infer<typeof Model.detail>;
   }
 
   static async create(db: Database, payload: LearnerModel.CreateBody) {
@@ -94,7 +84,7 @@ export abstract class LearnerService {
       throw status("Internal Server Error", { message: "Failed to create learner" });
     }
 
-    return created;
+    return created as z.infer<typeof Model.entity>;
   }
 
   static async update(db: Database, id: string, payload: LearnerModel.UpdateBody) {
@@ -113,7 +103,7 @@ export abstract class LearnerService {
       throw status("Internal Server Error", { message: "Failed to update learner" });
     }
 
-    return updated;
+    return updated as z.infer<typeof Model.entity>;
   }
 
   static async remove(db: Database, id: string) {

@@ -6,7 +6,6 @@ import { LoginContainer } from "@/client/components/login-register/login-contain
 import { LoginFormSection } from "@/client/components/login-register/login-form-section";
 import { LogoTitleDescription } from "@/client/components/login-register/logo-title-description";
 import { TopBar } from "@/client/components/login-register/top-bar";
-import { TrustedByCompanies } from "@/client/components/login-register/trusted-by-companies";
 import { Form } from "@/client/components/ui/form";
 import { FormInput } from "@/client/components/ui/form/form-input";
 import { FormSubmit } from "@/client/components/ui/form/form-submit";
@@ -20,10 +19,10 @@ import { toast } from "sonner";
 import z from "zod";
 
 const CONTENT = {
-  title: "Join Singapore's future-ready <br/> leaders with the FRBI Portal.",
-  mobileTitle: "Join Singapore's future-ready leaders with the FRBI Portal.",
-  description: "We'll check if you already have an account and help you create one if you don't.",
-  submitButtonText: "Log In/Sign Up",
+  title: "Welcome to Lionmarks TMS Platform.",
+  mobileTitle: "Welcome to Lionmarks TMS Platform.",
+  description: "Please login to your account to continue.",
+  submitButtonText: "Log In",
   submitButtonLoadingText: "Signing in...",
 };
 
@@ -97,7 +96,6 @@ export default function LoginPage() {
                   </Form>
                 </div>
               </div>
-              <TrustedByCompanies />
             </LoginContainer>
           </LoginFormSection>
 

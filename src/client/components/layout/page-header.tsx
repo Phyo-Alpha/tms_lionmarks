@@ -13,7 +13,7 @@ interface PageHeaderProps {
 }
 
 export const PageHeader: React.FC<PageHeaderProps> = ({
-  logo = { src: "/landing-page/sbf-logo.png", alt: "SBF Logo" },
+  logo = { src: "/logo.png", alt: "Lionmarks Logo" },
   loginButtonText = "Login/Sign Up",
   loginHref = "/login",
   className,
@@ -22,7 +22,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     <header className={cn("bg-background px-6 py-4", className)}>
       <nav className="flex items-center justify-between">
         <section className="flex items-center gap-2">
-          <img src={logo.src} alt={logo.alt} className="h-8 w-auto" />
+          <img src={logo.src} alt={logo.alt} className="aspect-video object-cover h-26" />
         </section>
 
         <section>

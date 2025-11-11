@@ -23,38 +23,20 @@ import {
   DialogTrigger,
 } from "@/client/components/ui/dialog";
 import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@/client/components/ui/empty";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/client/components/ui/pagination";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/client/components/ui/table";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/client/components/ui/select";
-import { Spinner } from "@/client/components/ui/spinner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  type ColumnDef,
+} from "@tanstack/react-table";
 import dayjs from "dayjs";
 import { toast } from "sonner";
 
@@ -72,6 +54,11 @@ import {
   type RegistrationFormValues,
 } from "@/client/features/admin/registrations";
 import { eden } from "@/client/lib/eden";
+import DataTable from "@/client/components/common/data-table";
+import { Page } from "@/client/components/layout/page";
+import { Typography } from "@/client/components/common/typography";
+import { Stack } from "@/client/components/layout/stack";
+import { Row } from "@/client/components/layout/row";
 
 const LIMIT_OPTIONS = [10, 20, 50] as const;
 const STATUS_OPTIONS = [
@@ -150,8 +137,7 @@ export default function RegistrationsPage() {
 
   const registrations = registrationsQuery.data?.data ?? [];
   const pagination = registrationsQuery.data?.pagination;
-  const totalPages = pagination?.totalPages ?? 1;
-  const currentPage = pagination?.page ?? normalizedFilters.page ?? 1;
+  const totalCount = pagination?.totalItems ?? 0;
 
   const courseOptions =
     coursesOptionsQuery.data?.data.map((course) => ({
@@ -180,6 +166,135 @@ export default function RegistrationsPage() {
       label: `${learner.firstName} ${learner.lastName}`,
       value: learner.id,
     })) ?? [];
+
+  const columns = useMemo<ColumnDef<RegistrationEntity>[]>(
+    () => [
+      {
+        accessorKey: "learner",
+        header: "Learner",
+        cell: ({ row }) => {
+          const registration = row.original;
+          return (
+            <div className="flex flex-col">
+              <span className="font-medium">
+                {registration.learner
+                  ? `${registration.learner.firstName} ${registration.learner.lastName}`
+                  : "Learner removed"}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {registration.learner?.email ?? "—"}
+              </span>
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "course",
+        header: "Course",
+        cell: ({ row }) => {
+          const registration = row.original;
+          return (
+            <div className="flex flex-col">
+              <span className="font-medium">{registration.course?.title ?? "Course removed"}</span>
+              <span className="text-xs text-muted-foreground">
+                {registration.course?.code ?? "—"}
+              </span>
+              {typeof registration.course?.capacity === "number" && (
+                <span className="text-[11px] text-muted-foreground">
+                  Capacity {registration.course.capacity}
+                </span>
+              )}
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => {
+          const status = row.original.status;
+          return <Badge variant={statusVariant[status]}>{status.replace("_", " ")}</Badge>;
+        },
+      },
+      {
+        accessorKey: "registeredAt",
+        header: "Registered",
+        cell: ({ row }) => {
+          const date = row.original.registeredAt;
+          return date ? dayjs(date).format("DD MMM YYYY") : "—";
+        },
+      },
+      {
+        accessorKey: "completedAt",
+        header: "Completed",
+        cell: ({ row }) => {
+          const date = row.original.completedAt;
+          return date ? dayjs(date).format("DD MMM YYYY") : "—";
+        },
+      },
+      {
+        accessorKey: "score",
+        header: "Score",
+        cell: ({ row }) => row.original.score ?? "—",
+      },
+      {
+        id: "actions",
+        header: () => <div className="text-right">Actions</div>,
+        cell: ({ row }) => {
+          const registration = row.original;
+          return (
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditingRegistration(registration)}
+              >
+                Edit
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-destructive hover:text-destructive"
+                onClick={() => setDeleteTarget(registration)}
+              >
+                Delete
+              </Button>
+            </div>
+          );
+        },
+      },
+    ],
+    [],
+  );
+
+  const table = useReactTable({
+    data: registrations,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: true,
+    pageCount: pagination?.totalPages ?? 1,
+    state: {
+      pagination: {
+        pageIndex: (normalizedFilters.page ?? 1) - 1,
+        pageSize: normalizedFilters.limit ?? 10,
+      },
+    },
+    onPaginationChange: (updater) => {
+      const newPagination =
+        typeof updater === "function"
+          ? updater({
+              pageIndex: (normalizedFilters.page ?? 1) - 1,
+              pageSize: normalizedFilters.limit ?? 10,
+            })
+          : updater;
+      setFilters({
+        page: newPagination.pageIndex + 1,
+        limit: newPagination.pageSize,
+      });
+    },
+  });
 
   const handleCreateRegistration = async (values: RegistrationFormValues) => {
     await createRegistrationMutation
@@ -233,350 +348,157 @@ export default function RegistrationsPage() {
       });
   };
 
-  const handlePageChange = (page: number) => {
-    setFilters({ page });
-  };
-
   const statusFilterValue =
     filters.status && STATUS_OPTIONS.some((item) => item.value === filters.status)
       ? (filters.status as (typeof STATUS_OPTIONS)[number]["value"])
       : "all";
 
+  const emptyStateComponent = (
+    <div className="flex flex-col items-center gap-4 py-8">
+      <p className="text-muted-foreground text-sm">No registrations yet</p>
+      <p className="text-muted-foreground text-sm">
+        Create an enrolment to link learners with active courses.
+      </p>
+      <Button onClick={() => setIsCreateOpen(true)}>Register learner</Button>
+    </div>
+  );
+
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-          Course registrations
-        </h1>
-        <p className="text-muted-foreground max-w-2xl text-sm">
-          Track learner progress, manage enrolments, and keep completion records aligned with course
-          schedules.
-        </p>
-      </header>
-
-      <div className="flex flex-col gap-4 rounded-lg border bg-background p-4 shadow-sm">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-1 flex-wrap items-center gap-3">
-            <Select
-              value={filters.courseId ?? "all"}
-              onValueChange={(value) => {
-                setFilters({
-                  courseId: value === "all" ? undefined : value,
-                  page: 1,
-                });
-              }}
-            >
-              <SelectTrigger className="w-[220px]">
-                <SelectValue placeholder="Course" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All courses</SelectItem>
-                {courseOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={filters.learnerId ?? "all"}
-              onValueChange={(value) => {
-                setFilters({
-                  learnerId: value === "all" ? undefined : value,
-                  page: 1,
-                });
-              }}
-            >
-              <SelectTrigger className="w-[220px]">
-                <SelectValue placeholder="Learner" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All learners</SelectItem>
-                {learnerOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={statusFilterValue}
-              onValueChange={(value) => {
-                setFilters({
-                  status: value === "all" ? undefined : value,
-                  page: 1,
-                });
-              }}
-            >
-              <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                {STATUS_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={String(filters.limit ?? 10)}
-              onValueChange={(value) => {
-                setFilters({
-                  limit: Number(value),
-                  page: 1,
-                });
-              }}
-            >
-              <SelectTrigger className="w-[120px]">
-                <SelectValue placeholder="Rows" />
-              </SelectTrigger>
-              <SelectContent>
-                {LIMIT_OPTIONS.map((option) => (
-                  <SelectItem key={option} value={String(option)}>
-                    {option} / page
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-            <DialogTrigger asChild>
-              <Button>Register learner</Button>
-            </DialogTrigger>
-            <DialogContent className="max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Enroll learner to course</DialogTitle>
-                <DialogDescription>
-                  Select a learner and course to create a new enrolment record. Capacity and
-                  conflicts will be validated before saving.
-                </DialogDescription>
-              </DialogHeader>
-              <RegistrationForm
-                learners={learnerOptions}
-                courses={courseOptions}
-                courseMeta={courseMeta}
-                onSubmit={handleCreateRegistration}
-                onCancel={() => setIsCreateOpen(false)}
-                submitLabel={
-                  createRegistrationMutation.isPending ? "Creating…" : "Create registration"
-                }
-              />
-            </DialogContent>
-          </Dialog>
+    <Page className="mx-auto w-full max-w-7xl p-6 lg:p-8">
+      <Stack>
+        <div className="flex flex-col gap-2">
+          <Typography.H1>Course registrations</Typography.H1>
+          <p className="text-muted-foreground max-w-2xl text-sm">
+            Track learner progress, manage enrolments, and keep completion records aligned with
+            course schedules.
+          </p>
         </div>
 
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Learner</TableHead>
-                <TableHead>Course</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Registered</TableHead>
-                <TableHead>Completed</TableHead>
-                <TableHead>Score</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {registrationsQuery.isLoading && (
-                <TableRow>
-                  <TableCell colSpan={7} className="py-12 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <Spinner className="size-6" />
-                      <p className="text-sm text-muted-foreground">Loading registrations…</p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
+        <div className="flex flex-col gap-4 rounded-lg border bg-background p-4 shadow-sm">
+          <Row gap="between" className="flex-wrap">
+            <Row className="flex-1 flex-wrap gap-3">
+              <Select
+                value={filters.courseId ?? "all"}
+                onValueChange={(value) => {
+                  setFilters({
+                    courseId: value === "all" ? undefined : value,
+                    page: 1,
+                  });
+                }}
+              >
+                <SelectTrigger className="w-[220px]">
+                  <SelectValue placeholder="Course" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All courses</SelectItem>
+                  {courseOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-              {registrationsQuery.isError && (
-                <TableRow>
-                  <TableCell colSpan={7} className="py-12">
-                    <Empty className="border-0">
-                      <EmptyHeader>
-                        <EmptyTitle>Unable to load registrations</EmptyTitle>
-                        <EmptyDescription className="max-w-sm">
-                          {(registrationsQuery.error as Error).message ?? "Please try again later."}
-                        </EmptyDescription>
-                      </EmptyHeader>
-                    </Empty>
-                  </TableCell>
-                </TableRow>
-              )}
+              <Select
+                value={filters.learnerId ?? "all"}
+                onValueChange={(value) => {
+                  setFilters({
+                    learnerId: value === "all" ? undefined : value,
+                    page: 1,
+                  });
+                }}
+              >
+                <SelectTrigger className="w-[220px]">
+                  <SelectValue placeholder="Learner" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All learners</SelectItem>
+                  {learnerOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-              {!registrationsQuery.isLoading &&
-                !registrationsQuery.isError &&
-                registrations.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={7} className="py-12">
-                      <Empty className="border-0">
-                        <EmptyHeader>
-                          <EmptyTitle>No registrations yet</EmptyTitle>
-                          <EmptyDescription>
-                            Create an enrolment to link learners with active courses.
-                          </EmptyDescription>
-                        </EmptyHeader>
-                        <EmptyContent>
-                          <Button onClick={() => setIsCreateOpen(true)}>Register learner</Button>
-                        </EmptyContent>
-                      </Empty>
-                    </TableCell>
-                  </TableRow>
-                )}
+              <Select
+                value={statusFilterValue}
+                onValueChange={(value) => {
+                  setFilters({
+                    status: value === "all" ? undefined : value,
+                    page: 1,
+                  });
+                }}
+              >
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {STATUS_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-              {registrations.map((registration) => (
-                <TableRow key={registration.id}>
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-medium">
-                        {registration.learner
-                          ? `${registration.learner.firstName} ${registration.learner.lastName}`
-                          : "Learner removed"}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {registration.learner?.email ?? "—"}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-medium">
-                        {registration.course?.title ?? "Course removed"}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {registration.course?.code ?? "—"}
-                      </span>
-                      {typeof registration.course?.capacity === "number" && (
-                        <span className="text-[11px] text-muted-foreground">
-                          Capacity {registration.course.capacity}
-                        </span>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={statusVariant[registration.status]}>
-                      {registration.status.replace("_", " ")}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {registration.registeredAt
-                      ? dayjs(registration.registeredAt).format("DD MMM YYYY")
-                      : "—"}
-                  </TableCell>
-                  <TableCell>
-                    {registration.completedAt
-                      ? dayjs(registration.completedAt).format("DD MMM YYYY")
-                      : "—"}
-                  </TableCell>
-                  <TableCell>{registration.score ?? "—"}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEditingRegistration(registration)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => setDeleteTarget(registration)}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-
-        {totalPages > 1 && (
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  aria-disabled={currentPage <= 1}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    if (currentPage > 1) {
-                      handlePageChange(currentPage - 1);
-                    }
-                  }}
-                />
-              </PaginationItem>
-              {(() => {
-                const windowSize = 2;
-                const start = Math.max(1, currentPage - windowSize);
-                const end = Math.min(totalPages, currentPage + windowSize);
-                const items: Array<number | "ellipsis-start" | "ellipsis-end"> = [];
-
-                if (start > 1) {
-                  items.push(1);
-                  if (start > 2) items.push("ellipsis-start");
-                }
-
-                for (let page = start; page <= end; page += 1) {
-                  items.push(page);
-                }
-
-                if (end < totalPages) {
-                  if (end < totalPages - 1) items.push("ellipsis-end");
-                  items.push(totalPages);
-                }
-
-                return items.map((item, index) => {
-                  if (item === "ellipsis-start" || item === "ellipsis-end") {
-                    return (
-                      <PaginationItem key={`${item}-${index}`}>
-                        <PaginationEllipsis />
-                      </PaginationItem>
-                    );
+              <Select
+                value={String(filters.limit ?? 10)}
+                onValueChange={(value) => {
+                  setFilters({
+                    limit: Number(value),
+                    page: 1,
+                  });
+                }}
+              >
+                <SelectTrigger className="w-[120px]">
+                  <SelectValue placeholder="Rows" />
+                </SelectTrigger>
+                <SelectContent>
+                  {LIMIT_OPTIONS.map((option) => (
+                    <SelectItem key={option} value={String(option)}>
+                      {option} / page
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Row>
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+              <DialogTrigger asChild>
+                <Button>Register learner</Button>
+              </DialogTrigger>
+              <DialogContent className="max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Enroll learner to course</DialogTitle>
+                  <DialogDescription>
+                    Select a learner and course to create a new enrolment record. Capacity and
+                    conflicts will be validated before saving.
+                  </DialogDescription>
+                </DialogHeader>
+                <RegistrationForm
+                  learners={learnerOptions}
+                  courses={courseOptions}
+                  courseMeta={courseMeta}
+                  onSubmit={handleCreateRegistration}
+                  onCancel={() => setIsCreateOpen(false)}
+                  submitLabel={
+                    createRegistrationMutation.isPending ? "Creating…" : "Create registration"
                   }
-
-                  const pageNumber = item;
-                  const isActive = pageNumber === currentPage;
-                  return (
-                    <PaginationItem key={pageNumber}>
-                      <PaginationLink
-                        href="#"
-                        isActive={isActive}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          handlePageChange(pageNumber);
-                        }}
-                      >
-                        {pageNumber}
-                      </PaginationLink>
-                    </PaginationItem>
-                  );
-                });
-              })()}
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  aria-disabled={currentPage >= totalPages}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    if (currentPage < totalPages) {
-                      handlePageChange(currentPage + 1);
-                    }
-                  }}
                 />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        )}
-      </div>
+              </DialogContent>
+            </Dialog>
+          </Row>
+
+          <DataTable
+            table={table}
+            isLoading={registrationsQuery.isLoading}
+            emptyStateComponent={emptyStateComponent}
+            emptyStateText="No registrations found."
+            showPagination={true}
+            dataCount={totalCount}
+          />
+        </div>
+      </Stack>
 
       <Dialog
         open={Boolean(editingRegistration)}
@@ -644,6 +566,6 @@ export default function RegistrationsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </Page>
   );
 }

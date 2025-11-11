@@ -3,6 +3,8 @@ import type { Database } from "@/server/api";
 import { course, courseRegistration } from "@/server/db/schema/trainee-schema";
 import type { CourseModel } from "./model";
 import { status } from "@/server/helpers/responseWrapper";
+import { CourseModel as Model } from "./model";
+import { z } from "zod";
 
 export abstract class CourseService {
   static async list(db: Database, query: CourseModel.ListQuery) {
@@ -25,8 +27,7 @@ export abstract class CourseService {
       filters.push(eq(course.isPublished, published));
     }
 
-    const whereClause =
-      filters.length > 0 ? and(...filters) : undefined;
+    const whereClause = filters.length > 0 ? and(...filters) : undefined;
 
     const sortColumn = {
       createdAt: course.createdAt,
@@ -36,37 +37,28 @@ export abstract class CourseService {
 
     const orderBy = order === "asc" ? asc(sortColumn) : desc(sortColumn);
 
-    let dataQuery = db
-      .select({ ...course })
-      .from(course)
-      .limit(limit)
-      .offset(offset)
-      .orderBy(orderBy);
+    const dataQuery = whereClause
+      ? db.select().from(course).where(whereClause).limit(limit).offset(offset).orderBy(orderBy)
+      : db.select().from(course).limit(limit).offset(offset).orderBy(orderBy);
 
-    let countQuery = db.select({ value: count() }).from(course);
+    const countQuery = whereClause
+      ? db.select({ value: count() }).from(course).where(whereClause)
+      : db.select({ value: count() }).from(course);
 
-    if (whereClause) {
-      dataQuery = dataQuery.where(whereClause);
-      countQuery = countQuery.where(whereClause);
-    }
-
-    const [data, totalResult] = await Promise.all([
-      dataQuery,
-      countQuery,
-    ]);
+    const [data, totalResult] = await Promise.all([dataQuery, countQuery]);
 
     const totalItems = totalResult[0]?.value ?? 0;
     const totalPages = Math.ceil(totalItems / limit) || 1;
 
     return {
-      data,
+      data: data as z.infer<typeof Model.entity>[],
       pagination: {
         page,
         limit,
         totalItems,
         totalPages,
       },
-    };
+    } satisfies z.infer<typeof Model.listResponse>;
   }
 
   static async getById(db: Database, id: string) {
@@ -85,7 +77,7 @@ export abstract class CourseService {
       throw status("Not Found", { message: "Course not found" });
     }
 
-    return record;
+    return record as z.infer<typeof Model.detail>;
   }
 
   static async create(db: Database, payload: CourseModel.CreateBody) {
@@ -95,7 +87,7 @@ export abstract class CourseService {
       throw status("Internal Server Error", { message: "Failed to create course" });
     }
 
-    return created;
+    return created as z.infer<typeof Model.entity>;
   }
 
   static async update(db: Database, id: string, payload: CourseModel.UpdateBody) {
@@ -114,7 +106,7 @@ export abstract class CourseService {
       throw status("Internal Server Error", { message: "Failed to update course" });
     }
 
-    return updated;
+    return updated as z.infer<typeof Model.entity>;
   }
 
   static async remove(db: Database, id: string) {

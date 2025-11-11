@@ -23,8 +23,8 @@ import { toast } from "sonner";
 import z from "zod";
 
 const CONTENT = {
-  title: "Welcome Back, Alex",
-  description: "Looks like you already have an FRBI account — sign in below to continue.",
+  title: "Welcome Back, Admin",
+  description: "Looks like you already have an Lionmarks TMS account — sign in below to continue.",
   submitButtonText: "Log In",
   submitButtonLoadingText: "Signing in...",
   notUserText: "Not {email}?",

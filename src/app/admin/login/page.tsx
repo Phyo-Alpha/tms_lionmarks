@@ -6,12 +6,10 @@ import { LoginContainer } from "@/client/components/login-register/login-contain
 import { LoginFormSection } from "@/client/components/login-register/login-form-section";
 import { TopBar } from "@/client/components/login-register/top-bar";
 import { UnderlinedLink } from "@/client/components/login-register/underlined-link";
-import { ButtonCustom } from "@/client/components/ui/button-custom";
 import { Form } from "@/client/components/ui/form";
 import { FormInput } from "@/client/components/ui/form/form-input";
 import { FormPasswordInput } from "@/client/components/ui/form/form-password-input";
 import { FormSubmit } from "@/client/components/ui/form/form-submit";
-import { authClient } from "@/client/lib/auth-client";
 import { authQueries } from "@/client/services/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -21,10 +19,8 @@ import { toast } from "sonner";
 import z from "zod";
 
 // ---------------- HARDCODED VALUES ----------------
-const ADMIN_LOGIN_TITLE = "SBF Employee Login";
-const ADMIN_LOGIN_DESCRIPTION = "FRBI Assessment Platform";
-const MICROSOFT_LOGO = "/images/microsoft-logo.png";
-const MICROSOFT_SIGN_IN_TEXT = "Sign in with Microsoft";
+const ADMIN_LOGIN_TITLE = "Lionmarks Admin Login";
+const ADMIN_LOGIN_DESCRIPTION = "Lionmarks TMS Platform";
 const LOGIN_BUTTON_TEXT = "Log In";
 const FORGOT_PASSWORD_TEXT = "Forgot Password?";
 const FORGOT_PASSWORD_LINK = "/forgot-password";
@@ -61,13 +57,6 @@ export default function AdminLoginPage() {
     });
   };
 
-  const handleMicrosoftLogin = () => {
-    authClient.signIn.social({
-      provider: "microsoft",
-      callbackURL: "/admin",
-    });
-  };
-
   return (
     <main className="h-screen flex w-full">
       <div className="w-full h-full flex flex-col">
@@ -75,8 +64,6 @@ export default function AdminLoginPage() {
         <TopBar variant="admin" />
 
         <div className="flex flex-row flex-1 overflow-hidden">
-          {/* LEFT - ADMIN LOGIN SECTION */}
-
           <LoginFormSection className="bg-gradient-to-r from-sbf-dark-blue to-sbf-teal-blue">
             <LoginContainer className="flex flex-col h-full mt-8">
               <div className="flex flex-1">
@@ -123,13 +110,6 @@ export default function AdminLoginPage() {
                           <p className="  text-sbf-cyan-blue font-bold px-3 ">OR</p>
                           <hr className="w-full" />
                         </div>
-
-                        <ButtonCustom
-                          logo={MICROSOFT_LOGO}
-                          text={MICROSOFT_SIGN_IN_TEXT}
-                          onClick={handleMicrosoftLogin}
-                          className="w-full"
-                        />
 
                         <div className="flex justify-center pt-4">
                           <UnderlinedLink

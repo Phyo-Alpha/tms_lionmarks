@@ -1,10 +1,8 @@
 import Image from "next/image";
 
 const LOGO_IMAGE = {
-  src: "/images/sbf-logo.png",
+  src: "/logo2.png",
   alt: "Company Logo",
-  width: 200,
-  height: 200,
 };
 
 interface LogoTitleDescriptionProps {
@@ -22,13 +20,13 @@ export const LogoTitleDescription = ({
 }: LogoTitleDescriptionProps) => {
   return (
     <div className="flex flex-col space-y-6">
-      <div className="h-8 2.5xl:h-10 4xl:h-12 w-fit mx-auto">
+      <div className="w-fit mx-auto pb-4">
         <Image
           src={LOGO_IMAGE.src}
-          width={LOGO_IMAGE.width}
-          height={LOGO_IMAGE.height}
           alt={LOGO_IMAGE.alt}
-          className="h-full w-auto object-contain"
+          width={300}
+          height={300}
+          className="aspect-video object-cover h-26"
         />
       </div>
       {mobileTitle ? (

@@ -5,7 +5,7 @@ import Link from "next/link";
 
 // Mock Data
 const TOP_BAR_CONTENT = {
-  logo: "/images/sbf-logo.png",
+  logo: "/logo2.png",
 };
 
 type TopBarProps = {
@@ -13,7 +13,7 @@ type TopBarProps = {
 };
 
 export const TopBar = ({ variant = "user" }: TopBarProps) => {
-  const buttonText = variant === "admin" ? "User Login" : "SBF Employee Login";
+  const buttonText = variant === "admin" ? "User Login" : "Lionmarks Admin Login";
   const buttonLink = variant === "admin" ? "/login" : "/admin/login";
 
   return (
@@ -22,14 +22,8 @@ export const TopBar = ({ variant = "user" }: TopBarProps) => {
       paddingOnly={true}
       className="flex items-center justify-between py-5 2.5xl:py-6 bg-sbf-white shadow-md relative z-10"
     >
-      <Link href="/login" className="h-6 2.5xl:h-7 3xl:h-8">
-        <Image
-          src={TOP_BAR_CONTENT.logo}
-          width={100}
-          height={100}
-          alt="Company Logo"
-          className="h-full w-auto object-contain cursor-pointer"
-        />
+      <Link href="/login">
+        <Image src={TOP_BAR_CONTENT.logo} width={200} height={100} alt="Company Logo" />
       </Link>
 
       <div>
