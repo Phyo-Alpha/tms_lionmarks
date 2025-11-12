@@ -1,44 +1,44 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { mysqlTable, varchar, text, timestamp, boolean } from "drizzle-orm/mysql-core";
 
-export const user = pgTable("user", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull().unique(),
+export const user = mysqlTable("user", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
-  image: text("image"),
+  image: varchar("image", { length: 1000 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
-  role: text("role"),
+  role: varchar("role", { length: 50 }),
   banned: boolean("banned").default(false),
   banReason: text("ban_reason"),
   banExpires: timestamp("ban_expires"),
 });
 
-export const session = pgTable("session", {
-  id: text("id").primaryKey(),
+export const session = mysqlTable("session", {
+  id: varchar("id", { length: 255 }).primaryKey(),
   expiresAt: timestamp("expires_at").notNull(),
-  token: text("token").notNull().unique(),
+  token: varchar("token", { length: 500 }).notNull().unique(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
-  ipAddress: text("ip_address"),
+  ipAddress: varchar("ip_address", { length: 100 }),
   userAgent: text("user_agent"),
-  userId: text("user_id")
+  userId: varchar("user_id", { length: 255 })
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  impersonatedBy: text("impersonated_by"),
-  activeOrganizationId: text("active_organization_id"),
+  impersonatedBy: varchar("impersonated_by", { length: 255 }),
+  activeOrganizationId: varchar("active_organization_id", { length: 255 }),
 });
 
-export const account = pgTable("account", {
-  id: text("id").primaryKey(),
-  accountId: text("account_id").notNull(),
-  providerId: text("provider_id").notNull(),
-  userId: text("user_id")
+export const account = mysqlTable("account", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  accountId: varchar("account_id", { length: 255 }).notNull(),
+  providerId: varchar("provider_id", { length: 100 }).notNull(),
+  userId: varchar("user_id", { length: 255 })
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   accessToken: text("access_token"),
@@ -47,17 +47,17 @@ export const account = pgTable("account", {
   accessTokenExpiresAt: timestamp("access_token_expires_at"),
   refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
   scope: text("scope"),
-  password: text("password"),
+  password: varchar("password", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
 
-export const verification = pgTable("verification", {
-  id: text("id").primaryKey(),
-  identifier: text("identifier").notNull(),
-  value: text("value").notNull(),
+export const verification = mysqlTable("verification", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  identifier: varchar("identifier", { length: 255 }).notNull(),
+  value: varchar("value", { length: 255 }).notNull(),
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
@@ -66,43 +66,43 @@ export const verification = pgTable("verification", {
     .notNull(),
 });
 
-export const organization = pgTable("organization", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  slug: text("slug").notNull().unique(),
-  logo: text("logo"),
+export const organization = mysqlTable("organization", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  name: varchar("name", { length: 500 }).notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  logo: varchar("logo", { length: 1000 }),
   createdAt: timestamp("created_at").notNull(),
   metadata: text("metadata"),
-  uen: text("uen").notNull(),
-  estimatedTurnover: text("estimated_turnover"),
-  yearInOperation: text("year_in_operation"),
-  participatedInProgramLast5Years: text("participated_in_program_last5_years"),
-  adequateSupportInFinance: text("adequate_support_in_finance"),
+  uen: varchar("uen", { length: 100 }).notNull(),
+  estimatedTurnover: varchar("estimated_turnover", { length: 100 }),
+  yearInOperation: varchar("year_in_operation", { length: 50 }),
+  participatedInProgramLast5Years: varchar("participated_in_program_last5_years", { length: 50 }),
+  adequateSupportInFinance: varchar("adequate_support_in_finance", { length: 50 }),
 });
 
-export const member = pgTable("member", {
-  id: text("id").primaryKey(),
-  organizationId: text("organization_id")
+export const member = mysqlTable("member", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  organizationId: varchar("organization_id", { length: 255 })
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),
-  userId: text("user_id")
+  userId: varchar("user_id", { length: 255 })
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  role: text("role").default("member").notNull(),
+  role: varchar("role", { length: 50 }).default("member").notNull(),
   createdAt: timestamp("created_at").notNull(),
-  roleInCompany: text("role_in_company"),
+  roleInCompany: varchar("role_in_company", { length: 100 }),
 });
 
-export const invitation = pgTable("invitation", {
-  id: text("id").primaryKey(),
-  organizationId: text("organization_id")
+export const invitation = mysqlTable("invitation", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  organizationId: varchar("organization_id", { length: 255 })
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),
-  email: text("email").notNull(),
-  role: text("role"),
-  status: text("status").default("pending").notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  role: varchar("role", { length: 50 }),
+  status: varchar("status", { length: 50 }).default("pending").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
-  inviterId: text("inviter_id")
+  inviterId: varchar("inviter_id", { length: 255 })
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
 });

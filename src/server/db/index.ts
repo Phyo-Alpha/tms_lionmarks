@@ -1,15 +1,20 @@
-// Make sure to install the 'pg' package
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
 import * as schema from "./schema";
 import Elysia from "elysia";
 
-// You can specify any property from the node-postgres connection options
+const poolConnection = mysql.createPool({
+  host: process.env.DATABASE_HOST,
+  port: Number(process.env.DATABASE_PORT),
+  user: process.env.DATABASE_USERNAME,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_NAME,
+});
+
 export const db = drizzle({
+  client: poolConnection,
   schema: schema,
-  connection: {
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.POSTGRES_SSL === "true",
-  },
+  mode: "default",
 });
 
 export const elysiaDb = new Elysia({ name: "DB" }).decorate("db", db);

@@ -1,7 +1,10 @@
+/// <reference types="bun-types" />
 import { randomUUID } from "node:crypto";
 import { sql } from "drizzle-orm";
-import { db } from "../src/server/db";
-import { account, user, learner, course, courseRegistration } from "@/server/db/schema";
+import { db } from "../db";
+import { learner, course, courseRegistration } from "@/server/db/schema";
+import { auth } from "../lib/auth";
+import env from "../config/env";
 
 async function seed() {
   try {
@@ -10,50 +13,41 @@ async function seed() {
     // Reset database
     console.log("🗑️  Resetting database...");
 
-    await db.execute(sql`
-        DO
-        $$
-        DECLARE
-            tbl text;
-        BEGIN
-            FOR tbl IN
-                SELECT tablename FROM pg_tables WHERE schemaname = 'public'
-            LOOP
-                EXECUTE 'TRUNCATE TABLE public.' || quote_ident(tbl) || ' RESTART IDENTITY CASCADE';
-            END LOOP;
-        END
-        $$;
-        `);
+    // MySQL truncate syntax - disable foreign key checks, truncate all tables
+    await db.execute(sql`SET FOREIGN_KEY_CHECKS = 0`);
+
+    const tables = [
+      "course_registration",
+      "learner",
+      "course",
+      "invitation",
+      "member",
+      "organization",
+      "verification",
+      "account",
+      "session",
+      "user",
+    ];
+
+    for (const table of tables) {
+      await db.execute(sql.raw(`TRUNCATE TABLE ${table}`));
+    }
+
+    await db.execute(sql`SET FOREIGN_KEY_CHECKS = 1`);
 
     // Insert sample data
     console.log("📊 Inserting sample data...");
 
-    await db.transaction(async (tx) => {
-      await tx.insert(user).values({
-        id: "eGSEvDEkKJ8GhH1nJdgXUsRcGL5FHQ9G",
-        name: "Admin",
-        email: "admin@tms.com",
-        emailVerified: false,
-        image: "",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+    await auth.api.createUser({
+      body: {
+        name: env.ADMIN_USERNAME,
+        email: env.ADMIN_EMAIL,
+        password: env.ADMIN_PASSWORD,
         role: "admin",
-        banned: false,
-        banReason: null,
-        banExpires: null,
-      });
+      },
+    });
 
-      await tx.insert(account).values({
-        id: "9hAji7jEqq21X4Gujs9syl7hbdSBi7yR",
-        accountId: "eGSEvDEkKJ8GhH1nJdgXUsRcGL5FHQ9G",
-        providerId: "credential",
-        userId: "eGSEvDEkKJ8GhH1nJdgXUsRcGL5FHQ9G",
-        password:
-          "6382b1fc56349722b84eca6d1491f7ee:320fd08c329b6b02e97fe83134c8164a568f919d0a3476beb6e4820d4d993a793c01650923e89ca7e52d96e8a4d7cea437d3928edcc216dc1c8f868da1b8a529",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
+    await db.transaction(async (tx) => {
       const learnersSeed = [
         {
           id: randomUUID(),
@@ -130,8 +124,8 @@ async function seed() {
       ]);
 
       console.log("✅ Database seeding completed successfully!");
-      console.log("\n🔐 Test credentials:");
-      console.log("  Admin: admin@tms.com Password: SBFAdmin@123");
+      console.log("\n🔐 Admin credentials:");
+      console.log(`  Admin: ${env.ADMIN_EMAIL} Password: ${env.ADMIN_PASSWORD}`);
     });
   } catch (error) {
     console.error("❌ Error seeding database:", error);

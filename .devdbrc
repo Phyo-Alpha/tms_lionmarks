@@ -1,0 +1,11 @@
+[
+  {
+    "name": "My MySQL Connection",
+    "type": "mysql",
+    "host": "srv445.hstgr.io",
+    "port": 3306,
+    "username": "u739449679_tms",
+    "password": "Tms_)vg.#'8192",
+    "database": "u739449679_tms"
+  }
+]

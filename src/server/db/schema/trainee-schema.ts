@@ -2,89 +2,68 @@ import { randomUUID } from "node:crypto";
 import { relations } from "drizzle-orm";
 import {
   boolean,
-  integer,
-  pgTable,
+  int,
+  mysqlTable,
   text,
   timestamp,
-  uniqueIndex,
-} from "drizzle-orm/pg-core";
+  varchar,
+} from "drizzle-orm/mysql-core";
 import { z } from "zod";
 
-export const learner = pgTable(
-  "learner",
-  {
-    id: text("id")
-      .primaryKey()
-      .$defaultFn(() => randomUUID()),
-    firstName: text("first_name").notNull(),
-    lastName: text("last_name").notNull(),
-    email: text("email").notNull().unique(),
-    phone: text("phone"),
-    organization: text("organization"),
-    status: text("status").default("active").notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-      .$onUpdate(() => /* @__PURE__ */ new Date())
-      .defaultNow()
-      .notNull(),
-    metadata: text("metadata"),
-  },
-  (table) => ({
-    emailIdx: uniqueIndex("learner_email_idx").on(table.email),
-  }),
-);
+export const learner = mysqlTable("learner", {
+  id: varchar("id", { length: 36 })
+    .primaryKey()
+    .$defaultFn(() => randomUUID()),
+  firstName: varchar("first_name", { length: 255 }).notNull(),
+  lastName: varchar("last_name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  phone: varchar("phone", { length: 50 }),
+  organization: varchar("organization", { length: 255 }),
+  status: varchar("status", { length: 50 }).default("active").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .defaultNow()
+    .notNull(),
+  metadata: text("metadata"),
+});
 
-export const course = pgTable(
-  "course",
-  {
-    id: text("id")
-      .primaryKey()
-      .$defaultFn(() => randomUUID()),
-    code: text("code").notNull().unique(),
-    title: text("title").notNull(),
-    description: text("description"),
-    durationHours: integer("duration_hours").default(0).notNull(),
-    startDate: timestamp("start_date"),
-    endDate: timestamp("end_date"),
-    capacity: integer("capacity"),
-    isPublished: boolean("is_published").default(false).notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-      .$onUpdate(() => /* @__PURE__ */ new Date())
-      .defaultNow()
-      .notNull(),
-  },
-  (table) => ({
-    codeIdx: uniqueIndex("course_code_idx").on(table.code),
-  }),
-);
+export const course = mysqlTable("course", {
+  id: varchar("id", { length: 36 })
+    .primaryKey()
+    .$defaultFn(() => randomUUID()),
+  code: varchar("code", { length: 100 }).notNull().unique(),
+  title: varchar("title", { length: 500 }).notNull(),
+  description: text("description"),
+  durationHours: int("duration_hours").default(0).notNull(),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  capacity: int("capacity"),
+  isPublished: boolean("is_published").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .defaultNow()
+    .notNull(),
+});
 
-export const courseRegistration = pgTable(
-  "course_registration",
-  {
-    id: text("id")
-      .primaryKey()
-      .$defaultFn(() => randomUUID()),
-    learnerId: text("learner_id")
-      .notNull()
-      .references(() => learner.id, { onDelete: "cascade" }),
-    courseId: text("course_id")
-      .notNull()
-      .references(() => course.id, { onDelete: "cascade" }),
-    status: text("status").default("enrolled").notNull(),
-    registeredAt: timestamp("registered_at").defaultNow().notNull(),
-    completedAt: timestamp("completed_at"),
-    score: integer("score"),
-    certificateUrl: text("certificate_url"),
-    notes: text("notes"),
-  },
-  (table) => ({
-    uniqueRegistration: uniqueIndex("course_registration_unique").on(
-      table.learnerId,
-      table.courseId,
-    ),
-  }),
-);
+export const courseRegistration = mysqlTable("course_registration", {
+  id: varchar("id", { length: 36 })
+    .primaryKey()
+    .$defaultFn(() => randomUUID()),
+  learnerId: varchar("learner_id", { length: 36 })
+    .notNull()
+    .references(() => learner.id, { onDelete: "cascade" }),
+  courseId: varchar("course_id", { length: 36 })
+    .notNull()
+    .references(() => course.id, { onDelete: "cascade" }),
+  status: varchar("status", { length: 50 }).default("enrolled").notNull(),
+  registeredAt: timestamp("registered_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+  score: int("score"),
+  certificateUrl: varchar("certificate_url", { length: 1000 }),
+  notes: text("notes"),
+});
 
 export const learnerRelations = relations(learner, ({ many }) => ({
   registrations: many(courseRegistration),

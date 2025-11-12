@@ -14,7 +14,17 @@ declare global {
 
 const envSchema = z.object({
   // Database Configuration
-  DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
+  DATABASE_HOST: z.string().min(1, "DATABASE_HOST is required"),
+  DATABASE_PORT: z.string().min(1, "DATABASE_PORT is required"),
+  DATABASE_USERNAME: z.string().min(1, "DATABASE_USERNAME is required"),
+  DATABASE_PASSWORD: z.string().min(1, "DATABASE_PASSWORD is required"),
+  DATABASE_NAME: z.string().min(1, "DATABASE_NAME is required"),
+
+  // Admin Credentials
+  ADMIN_USERNAME: z.string().min(1, "ADMIN_USERNAME is required"),
+  ADMIN_EMAIL: z.string().min(1, "ADMIN_EMAIL is required"),
+  ADMIN_PASSWORD: z.string().min(1, "ADMIN_PASSWORD is required"),
+
   // Better Auth Configuration
   BETTER_AUTH_SECRET: z.string().min(1, "BETTER_AUTH_SECRET is required"),
   NEXT_PUBLIC_SERVER_URL: z.string().min(1, "NEXT_PUBLIC_SERVER_URL is required"),
