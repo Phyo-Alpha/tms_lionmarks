@@ -1,0 +1,368 @@
+/* Registration Form - Navy Blue Theme */
+:root {
+    --navy-blue: #1e3a8a;
+    --light-grey: #f8f9fa;
+    --border-grey: #e5e7eb;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --white: #ffffff;
+    --red: #dc2626;
+}
+
+body {
+    font-family: "Noto Sans", 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-grey);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* Header Section */
+.header-section {
+    background-color: var(--navy-blue);
+    color: var(--white);
+    padding: 2rem 0;
+    text-align: center;
+}
+
+.logo-section {
+    margin-bottom: 1.5rem;
+}
+
+.logo {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.logo .brain-icon {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background-color: var(--white);
+    border-radius: 50%;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.tagline {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 1rem;
+}
+
+.form-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Progress Indicator */
+.progress-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.progress-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    width: 100px;
+    height: 2px;
+    background-color: var(--navy-blue);
+    z-index: 1;
+}
+
+.progress-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.progress-circle.active {
+    background-color: var(--white);
+    color: var(--navy-blue);
+    border: 2px solid var(--navy-blue);
+}
+
+.progress-circle.inactive {
+    background-color: var(--navy-blue);
+    color: var(--white);
+}
+
+.progress-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.progress-label.active {
+    color: var(--navy-blue);
+}
+
+.progress-label.inactive {
+    color: var(--white);
+}
+
+/* Main Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Form Card */
+.registration-card {
+    background-color: var(--white);
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: -2rem auto 2rem;
+    padding: 2rem;
+    position: relative;
+    z-index: 10;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--navy-blue);
+    margin-bottom: 2rem;
+}
+
+/* Form Elements */
+.form-section {
+    margin-bottom: 2rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+.form-label.required::after {
+    content: ' *';
+    color: var(--red);
+}
+
+.form-control,
+.form-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-grey);
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: var(--white);
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--navy-blue);
+    box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.1);
+}
+
+/* Two Column Layout */
+.row {
+    display: flex;
+    flex-direction: row;
+    gap: 3rem;
+    margin-bottom: 1rem;
+}
+
+.col-md-6 {
+    flex: 1;
+}
+
+.col-md-12 {
+    flex: 1;
+    width: 100%;
+}
+
+/* Phone Row */
+.phone-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.country-code {
+    flex: 0 0 120px;
+}
+
+.phone-number {
+    flex: 1;
+}
+
+/* Radio Buttons */
+.radio-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-check-input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--navy-blue);
+}
+
+.form-check-label {
+    margin: 0;
+    font-weight: normal;
+}
+
+/* Alerts */
+.alert {
+    padding: 1rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.alert-success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.alert-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+.alert-info {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #93c5fd;
+}
+
+/* Buttons */
+.btn {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-primary {
+    background-color: var(--navy-blue);
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    background-color: #1e40af;
+    transform: translateY(-1px);
+}
+
+.d-grid {
+    display: grid;
+}
+
+.mt-4 {
+    margin-top: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+    }
+
+    .phone-row {
+        flex-direction: column;
+    }
+
+    .country-code {
+        flex: 1;
+    }
+
+    .progress-step:not(:last-child)::after {
+        width: 50px;
+    }
+
+    .registration-card {
+        margin: -1rem 1rem 2rem;
+        padding: 1.5rem;
+    }
+}
+
+/* Additional Utility Classes */
+.text-center {
+    text-align: center;
+}
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+.ms-2 {
+    margin-left: 0.5rem;
+}
+
+/* Icon Styles */
+.fas {
+    margin-right: 0.5rem;
+}
+
+/* Loading State */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Custom Select Styling */
+.form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
+}

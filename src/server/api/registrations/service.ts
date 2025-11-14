@@ -84,37 +84,44 @@ export abstract class RegistrationService {
   }
 
   static async getById(db: Database, id: string) {
-    const record = await db.query.courseRegistration.findFirst({
+    const registration = await db.query.courseRegistration.findFirst({
       where: (registrationTable, { eq }) => eq(registrationTable.id, id),
-      with: {
-        learner: {
-          columns: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            status: true,
-          },
-        },
-        course: {
-          columns: {
-            id: true,
-            code: true,
-            title: true,
-            isPublished: true,
-            startDate: true,
-            endDate: true,
-            capacity: true,
-          },
-        },
-      },
     });
 
-    if (!record) {
+    if (!registration) {
       throw status("Not Found", { message: "Course registration not found" });
     }
 
-    return record as z.infer<typeof Model.entity>;
+    const [learner, course] = await Promise.all([
+      db.query.learner.findFirst({
+        where: (learnerTable, { eq }) => eq(learnerTable.id, registration.learnerId),
+        columns: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          status: true,
+        },
+      }),
+      db.query.course.findFirst({
+        where: (courseTable, { eq }) => eq(courseTable.id, registration.courseId),
+        columns: {
+          id: true,
+          code: true,
+          title: true,
+          isPublished: true,
+          startDate: true,
+          endDate: true,
+          capacity: true,
+        },
+      }),
+    ]);
+
+    return {
+      ...registration,
+      learner: learner ?? undefined,
+      course: course ?? undefined,
+    } as z.infer<typeof Model.entity>;
   }
 
   static async create(db: Database, payload: RegistrationModel.CreateBody) {

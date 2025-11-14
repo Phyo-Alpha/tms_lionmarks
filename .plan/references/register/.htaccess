@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+Options +FollowSymLinks -MultiViews
+RewriteEngine On
+RewriteBase /
+
+#############################################################
+# All URLs are redirected to /register/index.php
+#############################################################
+
+RewriteCond %{REQUEST_FILENAME} !-f
+
+RewriteRule . /register/index.php [QSA,L]
+</IfModule>

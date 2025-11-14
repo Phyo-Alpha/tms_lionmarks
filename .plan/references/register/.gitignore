@@ -1,0 +1,3 @@
+# Ignore PHPMailer debug logs
+logs/
+*.log

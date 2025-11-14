@@ -6,12 +6,13 @@ export abstract class Emailer {
     host: env.SMTP_HOST ?? "localhost",
     port: env.SMTP_PORT ? Number(env.SMTP_PORT) : 587,
     secure: env.SMTP_PORT === "465",
-    auth: env.SMTP_USER && env.SMTP_PASS
-      ? {
-          user: env.SMTP_USER,
-          pass: env.SMTP_PASS,
-        }
-      : undefined,
+    auth:
+      env.SMTP_USER && env.SMTP_PASS
+        ? {
+            user: env.SMTP_USER,
+            pass: env.SMTP_PASS,
+          }
+        : undefined,
   });
 
   static async sendEmail(params: { to: string; subject: string; text: string }) {

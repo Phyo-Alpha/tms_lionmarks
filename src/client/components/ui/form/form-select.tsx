@@ -93,7 +93,7 @@ const FormSelect = ({
                     "flex flex-row gap-1 font-normal whitespace-nowrap",
                     !label && "hidden",
                     label &&
-                      "text-muted-foreground absolute top-1/2 left-4 z-10 origin-[0] -translate-y-1/2 scale-100 transform px-1 p duration-300 font-medium",
+                      "text-muted-foreground absolute top-1/2 left-4 z-10 -translate-y-1/2 scale-100 transform px-1 p duration-300 font-medium",
                     label &&
                       (opened || field.value) &&
                       "bg-card text-primary font-medium top-1.5 -translate-y-4 scale-75",
@@ -133,7 +133,7 @@ const FormSelect = ({
                   >
                     <SelectTrigger
                       className={cn(
-                        "min-h-0 w-full min-w-0",
+                        "min-h-14 w-full min-w-0",
                         className,
                         disabled && "cursor-not-allowed",
                         opened && "border-ring",

@@ -47,38 +47,42 @@ async function seed() {
       },
     });
 
-    await db.transaction(async (tx) => {
-      const learnersSeed = [
-        {
-          id: randomUUID(),
-          firstName: "Ava",
-          lastName: "Tan",
-          email: "ava.tan@example.com",
-          phone: "+6590001111",
-          organization: "Acme Corp",
-          status: "active",
-        },
-        {
-          id: randomUUID(),
-          firstName: "Noah",
-          lastName: "Lim",
-          email: "noah.lim@example.com",
-          phone: "+6590002222",
-          organization: "Globex",
-          status: "active",
-        },
-        {
-          id: randomUUID(),
-          firstName: "Emma",
-          lastName: "Lee",
-          email: "emma.lee@example.com",
-          phone: "+6590003333",
-          organization: "Innotech",
-          status: "inactive",
-        },
-      ] satisfies Array<typeof learner.$inferInsert>;
+    console.log("✅ Database seeding completed successfully!");
+    console.log("\n🔐 Admin credentials:");
+    console.log(`  Admin: ${env.ADMIN_EMAIL} Password: ${env.ADMIN_PASSWORD}`);
 
-      await tx.insert(learner).values(learnersSeed);
+    await db.transaction(async (tx) => {
+      //   const learnersSeed = [
+      //     {
+      //       id: randomUUID(),
+      //       firstName: "Ava",
+      //       lastName: "Tan",
+      //       email: "ava.tan@example.com",
+      //       phone: "+6590001111",
+      //       organization: "Acme Corp",
+      //       status: "active",
+      //     },
+      //     {
+      //       id: randomUUID(),
+      //       firstName: "Noah",
+      //       lastName: "Lim",
+      //       email: "noah.lim@example.com",
+      //       phone: "+6590002222",
+      //       organization: "Globex",
+      //       status: "active",
+      //     },
+      //     {
+      //       id: randomUUID(),
+      //       firstName: "Emma",
+      //       lastName: "Lee",
+      //       email: "emma.lee@example.com",
+      //       phone: "+6590003333",
+      //       organization: "Innotech",
+      //       status: "inactive",
+      //     },
+      //   ] satisfies Array<typeof learner.$inferInsert>;
+
+      //   await tx.insert(learner).values(learnersSeed);
 
       const coursesSeed = [
         {
@@ -105,27 +109,27 @@ async function seed() {
 
       await tx.insert(course).values(coursesSeed);
 
-      await tx.insert(courseRegistration).values([
-        {
-          learnerId: learnersSeed[0]?.id,
-          courseId: coursesSeed[0]?.id,
-          status: "enrolled",
-        },
-        {
-          learnerId: learnersSeed[1]?.id,
-          courseId: coursesSeed[0]?.id,
-          status: "in_progress",
-        },
-        {
-          learnerId: learnersSeed[2]?.id,
-          courseId: coursesSeed[1]?.id,
-          status: "withdrawn",
-        },
-      ]);
+      //   await tx.insert(courseRegistration).values([
+      //     {
+      //       learnerId: learnersSeed[0]?.id,
+      //       courseId: coursesSeed[0]?.id,
+      //       status: "enrolled",
+      //     },
+      //     {
+      //       learnerId: learnersSeed[1]?.id,
+      //       courseId: coursesSeed[0]?.id,
+      //       status: "in_progress",
+      //     },
+      //     {
+      //       learnerId: learnersSeed[2]?.id,
+      //       courseId: coursesSeed[1]?.id,
+      //       status: "withdrawn",
+      //     },
+      //   ]);
 
-      console.log("✅ Database seeding completed successfully!");
-      console.log("\n🔐 Admin credentials:");
-      console.log(`  Admin: ${env.ADMIN_EMAIL} Password: ${env.ADMIN_PASSWORD}`);
+      //   console.log("✅ Database seeding completed successfully!");
+      //   console.log("\n🔐 Admin credentials:");
+      //   console.log(`  Admin: ${env.ADMIN_EMAIL} Password: ${env.ADMIN_PASSWORD}`);
     });
   } catch (error) {
     console.error("❌ Error seeding database:", error);

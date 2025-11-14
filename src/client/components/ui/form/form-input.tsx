@@ -61,8 +61,8 @@ const FormInput = ({
           <Label
             htmlFor={"input-" + field.name}
             className={cn(
-              "text-muted-foreground peer-focus:bg-card peer-focus:text-primary absolute top-1.5 z-10 origin-left bg-card -translate-y-4 scale-75 transform px-1 p duration-300 peer-placeholder-shown:top-4.5 peer-placeholder-shown:left-4 peer-placeholder-shown:-translate-y-2 peer-placeholder-shown:bg-card 2xl:peer-placeholder-shown:-translate-y-1 2.5xl:peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:top-1.5 peer-focus:-translate-y-4 peer-focus:scale-75 whitespace-nowrap",
-              field.value && "bg-card text-primary top-1.5 left-4  -translate-y-4 scale-75",
+              "text-muted-foreground peer-focus:bg-card peer-focus:text-primary absolute top-2 z-10 origin-left bg-card -translate-y-4 scale-75 transform px-1 duration-300 peer-placeholder-shown:top-7 peer-placeholder-shown:left-4 peer-placeholder-shown:-translate-y-2 peer-placeholder-shown:bg-card peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-75 whitespace-nowrap",
+              field.value && "bg-card text-primary top-2 left-4 -translate-y-4 scale-75",
               disabled && "opacity-50",
             )}
           >
