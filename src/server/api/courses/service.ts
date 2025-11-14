@@ -81,10 +81,19 @@ export abstract class CourseService {
   }
 
   static async create(db: Database, payload: CourseModel.CreateBody) {
-    const [created] = await db.insert(course).values(payload).returning();
+    const result = await db.insert(course).values(payload).$returningId();
+    const createdId = Array.isArray(result) && result[0] ? result[0].id : null;
+
+    if (!createdId) {
+      throw status("Internal Server Error", { message: "Failed to create course" });
+    }
+
+    const created = await db.query.course.findFirst({
+      where: (courseTable, { eq }) => eq(courseTable.id, createdId),
+    });
 
     if (!created) {
-      throw status("Internal Server Error", { message: "Failed to create course" });
+      throw status("Internal Server Error", { message: "Failed to fetch created course" });
     }
 
     return created as z.infer<typeof Model.entity>;
@@ -93,14 +102,17 @@ export abstract class CourseService {
   static async update(db: Database, id: string, payload: CourseModel.UpdateBody) {
     await this.ensureExists(db, id);
 
-    const [updated] = await db
+    await db
       .update(course)
       .set({
         ...payload,
         updatedAt: new Date(),
       })
-      .where(eq(course.id, id))
-      .returning();
+      .where(eq(course.id, id));
+
+    const updated = await db.query.course.findFirst({
+      where: (courseTable, { eq }) => eq(courseTable.id, id),
+    });
 
     if (!updated) {
       throw status("Internal Server Error", { message: "Failed to update course" });
@@ -110,7 +122,13 @@ export abstract class CourseService {
   }
 
   static async remove(db: Database, id: string) {
-    await this.ensureExists(db, id);
+    const existing = await db.query.course.findFirst({
+      where: (courseTable, { eq }) => eq(courseTable.id, id),
+    });
+
+    if (!existing) {
+      throw status("Not Found", { message: "Course not found" });
+    }
 
     const registrations = await db
       .select()
@@ -123,13 +141,9 @@ export abstract class CourseService {
       });
     }
 
-    const [deleted] = await db.delete(course).where(eq(course.id, id)).returning();
+    await db.delete(course).where(eq(course.id, id));
 
-    if (!deleted) {
-      throw status("Internal Server Error", { message: "Failed to delete course" });
-    }
-
-    return deleted;
+    return existing;
   }
 
   private static async ensureExists(db: Database, id: string) {

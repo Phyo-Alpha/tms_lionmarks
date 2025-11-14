@@ -172,15 +172,16 @@ export abstract class RegistrationService {
       desiredStatus: payload.status as RegistrationStatus,
     });
 
-    const [created] = await db.insert(courseRegistration).values(payload).returning();
+    const result = await db.insert(courseRegistration).values(payload).$returningId();
+    const createdId = Array.isArray(result) && result[0] ? result[0].id : null;
 
-    if (!created) {
+    if (!createdId) {
       throw status("Internal Server Error", {
         message: "Failed to create course registration",
       });
     }
 
-    return this.getById(db, created.id);
+    return this.getById(db, createdId);
   }
 
   static async update(db: Database, id: string, payload: RegistrationModel.UpdateBody) {
@@ -249,38 +250,28 @@ export abstract class RegistrationService {
       excludeRegistrationId: id,
     });
 
-    const [updated] = await db
+    await db
       .update(courseRegistration)
       .set({
         ...payload,
       })
-      .where(eq(courseRegistration.id, id))
-      .returning();
+      .where(eq(courseRegistration.id, id));
 
-    if (!updated) {
-      throw status("Internal Server Error", {
-        message: "Failed to update course registration",
-      });
-    }
-
-    return this.getById(db, updated.id);
+    return this.getById(db, id);
   }
 
   static async remove(db: Database, id: string) {
-    await this.ensureExists(db, id);
+    const existing = await db.query.courseRegistration.findFirst({
+      where: (registrationTable, { eq }) => eq(registrationTable.id, id),
+    });
 
-    const [deleted] = await db
-      .delete(courseRegistration)
-      .where(eq(courseRegistration.id, id))
-      .returning();
-
-    if (!deleted) {
-      throw status("Internal Server Error", {
-        message: "Failed to delete course registration",
-      });
+    if (!existing) {
+      throw status("Not Found", { message: "Course registration not found" });
     }
 
-    return deleted;
+    await db.delete(courseRegistration).where(eq(courseRegistration.id, id));
+
+    return existing;
   }
 
   private static async ensureExists(db: Database, id: string) {

@@ -78,10 +78,19 @@ export abstract class LearnerService {
   }
 
   static async create(db: Database, payload: LearnerModel.CreateBody) {
-    const [created] = await db.insert(learner).values(payload).returning();
+    const result = await db.insert(learner).values(payload).$returningId();
+    const createdId = Array.isArray(result) && result[0] ? result[0].id : null;
+
+    if (!createdId) {
+      throw status("Internal Server Error", { message: "Failed to create learner" });
+    }
+
+    const created = await db.query.learner.findFirst({
+      where: (learnerTable, { eq }) => eq(learnerTable.id, createdId),
+    });
 
     if (!created) {
-      throw status("Internal Server Error", { message: "Failed to create learner" });
+      throw status("Internal Server Error", { message: "Failed to fetch created learner" });
     }
 
     return created as z.infer<typeof Model.entity>;
@@ -90,14 +99,17 @@ export abstract class LearnerService {
   static async update(db: Database, id: string, payload: LearnerModel.UpdateBody) {
     await this.ensureExists(db, id);
 
-    const [updated] = await db
+    await db
       .update(learner)
       .set({
         ...payload,
         updatedAt: new Date(),
       })
-      .where(eq(learner.id, id))
-      .returning();
+      .where(eq(learner.id, id));
+
+    const updated = await db.query.learner.findFirst({
+      where: (learnerTable, { eq }) => eq(learnerTable.id, id),
+    });
 
     if (!updated) {
       throw status("Internal Server Error", { message: "Failed to update learner" });
@@ -107,7 +119,13 @@ export abstract class LearnerService {
   }
 
   static async remove(db: Database, id: string) {
-    await this.ensureExists(db, id);
+    const existing = await db.query.learner.findFirst({
+      where: (learnerTable, { eq }) => eq(learnerTable.id, id),
+    });
+
+    if (!existing) {
+      throw status("Not Found", { message: "Learner not found" });
+    }
 
     const registrations = await db
       .select()
@@ -120,13 +138,9 @@ export abstract class LearnerService {
       });
     }
 
-    const [deleted] = await db.delete(learner).where(eq(learner.id, id)).returning();
+    await db.delete(learner).where(eq(learner.id, id));
 
-    if (!deleted) {
-      throw status("Internal Server Error", { message: "Failed to delete learner" });
-    }
-
-    return deleted;
+    return existing;
   }
 
   private static async ensureExists(db: Database, id: string) {
