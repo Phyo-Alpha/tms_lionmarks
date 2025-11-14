@@ -3,6 +3,7 @@ import { LayoutProps } from "@/client/types/next";
 import { redirect } from "next/navigation";
 import { getSession } from "../../../client/lib/get-session";
 import { AdminSidebar } from "@/client/features/admin/components/admin-sidebar";
+import AdminHeader from "@/client/features/admin/components/header";
 
 export default async function Layout({ children }: LayoutProps) {
   const session = await getSession();
@@ -20,7 +21,10 @@ export default async function Layout({ children }: LayoutProps) {
     <div className="flex h-screen flex-col overflow-hidden">
       <div className="flex flex-1 overflow-hidden">
         <AdminSidebar />
-        <main className="flex-1 overflow-y-auto bg-background">{children}</main>
+        <main className="flex-1 overflow-y-auto bg-background">
+          <AdminHeader />
+          {children}
+        </main>
       </div>
     </div>
   );

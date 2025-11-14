@@ -15,7 +15,7 @@ export abstract class Emailer {
         : undefined,
   });
 
-  static async sendEmail(params: { to: string; subject: string; text: string }) {
+  static async sendEmail(params: { to: string; subject: string; text?: string; html?: string }) {
     if (!env.SMTP_FROM) {
       throw new Error("SMTP_FROM environment variable is not set");
     }
@@ -24,6 +24,7 @@ export abstract class Emailer {
       to: params.to,
       subject: params.subject,
       text: params.text,
+      html: params.html,
     });
 
     return info;

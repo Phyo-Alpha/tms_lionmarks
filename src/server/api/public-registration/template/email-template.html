@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Course Registration Confirmation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet" />
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #f8fafb;
+      font-family: &quot;Questrial&quot;, sans-serif;
+    "
+  >
+    <div
+      style="
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      "
+    >
+      <!-- Header Section -->
+      <div style="padding: 40px 30px; text-align: center">
+        <img src="cid:lionmarks_logo" alt="Lionmarks Logo" width="100px" height="100px" />
+        <h1 style="font-size: 28px; font-weight: 400; margin: 0; letter-spacing: 0.5px">
+          Hello, {{to_name}}
+        </h1>
+        <p style="font-size: 16px; margin: 10px 0 0; font-weight: 300">
+          Thank you for your course registration on LionMarks Singapore
+        </p>
+      </div>
+
+      <!-- Main Content -->
+      <div style="padding: 40px 30px">
+        <!-- Calendar Invite Section -->
+        <div
+          style="
+            background-color: #f8fafb;
+            border-left: 4px solid #059669;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 8px 8px 0;
+          "
+        >
+          <h2
+            style="
+              color: #09246c;
+              font-size: 20px;
+              font-weight: 400;
+              margin: 0 0 15px;
+              letter-spacing: 0.3px;
+            "
+          >
+            📅 Calendar Invite
+          </h2>
+          <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0">
+            We will send you a Google Calendar invite to confirm the course schedule and venue.
+            Please look out for our Google Calendar email. If you don't receive any invite from us
+            within 3 days, please check your spam box or contact us for support.
+          </p>
+        </div>
+
+        <!-- WSQ/SSG Training Grant Section -->
+        <div
+          style="
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 8px 8px 0;
+          "
+        >
+          <h2
+            style="
+              color: #09246c;
+              font-size: 20px;
+              font-weight: 400;
+              margin: 0 0 15px;
+              letter-spacing: 0.3px;
+            "
+          >
+            💰 WSQ/SSG Training Grant (TG)
+          </h2>
+          <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0">
+            If you select WSQ/SSG TG payment mode, please fill up the
+            <a href="https://www.tpgateway.gov.sg/plan-courses/ssg-funding"
+              >WSQ Training Grant Application Form</a
+            >
+            for each participant. We will apply the WSQ funding for participants on TPgateway. Then
+            we will send you the invoice for the net fee to pay. For individual, please do not claim
+            the full fee using your Skills Future Credit.
+          </p>
+        </div>
+
+        <!--- SFEC Funding -->
+        <h2 style="font-size: 20px; font-weight: bold">SFEC Funding</h2>
+        <p>
+          For SFEC eligible companies, please submit your SFEC claim on
+          <a href="https://www.enterprisesg.gov.sg/financial-support/skillsfuture-enterprise-credit"
+            >SFEC Enterprise Job Skills Microsite</a
+          >
+          for us to endorse.
+        </p>
+
+        <!-- IBF STS Funding -->
+        <h2 style="font-size: 20px; font-weight: bold">IBF STS Funding</h2>
+        <p>
+          If you select IBF STS funding payment mode, please fill up the
+          <a
+            href="https://www.ibf.org.sg/home/for-individuals/skills-and-jobs-development/training-support/IBF-STS"
+            >IBF STS Trainee Eligibility Form</a
+          >
+          and send us your supporting document.
+        </p>
+
+        <!-- SkillsFuture Claim (SFC) -->
+        <h2 style="font-size: 20px; font-weight: bold">SkillsFuture Claim (SFC)</h2>
+        <p>
+          If you select SkillsFuture Credit payment mode, please print the order email in pdf format
+          as supporting document. Then you go to
+          <a href="https://www.myskillsfuture.gov.sg/content/portal/en/index.html">
+            MySkillsFuture Portal
+          </a>
+          to submit your claim with the supporting document. Please search the course by entering
+          the course code to the search box
+          <strong
+            >(do not use course title to search to avoid selecting the wrong training
+            provider)</strong
+          >. You need to submit SFC prior to the course start date. If you are in doubt, please
+          download the
+          <a
+            href="https://www.lasalle.edu.sg/sites/default/files/inline-files/Step-by-step-Guide-on-Claiming-SkillsFuture-Credits-Individuals-_LASALLE.pdf"
+            >Step by Step SkillsFuture Claim Guide</a
+          >
+          to submit your SFC claim.
+        </p>
+        <p style="color: red; font-weight: bold">
+          Please remember to add 8% GST to your SFC claim.
+        </p>
+
+        <!-- Paynow -->
+        <h2 style="font-size: 20px; font-weight: bold">PayNow</h2>
+        <p>
+          If you select PayNow payment mode, please scan the QR code below using your bank PayNow
+          apps or PayNow to our UEN: S97SSG123G. Send the payment completed snapshot to us.
+        </p>
+        <img src="cid:paynow_qr" alt="Paynow QR Code" width="250px" height="250px" />
+
+        <!-- Company Invoice -->
+        <h2 style="font-size: 20px; font-weight: bold">Company Invoice</h2>
+        <p>
+          If your company requires tax invoice for payment processing, please reply back the order
+          email and request for an official invoice.
+        </p>
+
+        <!-- Cancellation and Refund Policy -->
+        <h2 style="font-size: 20px; font-weight: bold">Cancellation and Refund Policy</h2>
+        <p>
+          Note that we reserve the right to cancel the course if there is not enough participant for
+          the class or the trainer is not available due to unforeseen circumstances. We will refund
+          100% upon cancellation if payment is made.
+        </p>
+
+        <!-- Support -->
+        <h2 style="font-size: 20px; font-weight: bold">Support</h2>
+        <p>If you have any question about your course registration, please contact us at</p>
+        <ul style="list-style-type: disc; padding-left: 20px">
+          <li>
+            Email:
+            <a href="mailto:support@lionmarks.com">support@lionmarks.com</a>
+          </li>
+          <li>Tel: <a href="tel:+6562221234">62221234</a> ( Monday - Sunday, 9am - 5pm )</li>
+        </ul>
+
+        <p>
+          Thank you for signing up with Lionmarks Training. Hope you have a rich and memorable
+          learning experience with us.
+        </p>
+        <p>Your course confirmation is below.</p>
+
+        <!-- Order Information -->
+        <div style="margin-bottom: 30px">
+          <h2
+            style="
+              color: #09246c;
+              font-size: 20px;
+              font-weight: 400;
+              margin: 0 0 20px;
+              letter-spacing: 0.3px;
+            "
+          >
+            Order Information
+          </h2>
+          <p style="color: #6b7280; font-size: 14px; margin: 0">
+            Your Order #{{order_number}} (placed on {{today_date}})
+          </p>
+        </div>
+
+        <!-- Information Cards -->
+        <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap">
+          <!-- Billing Information Card -->
+          <div
+            style="
+              flex: 1;
+              min-width: 300px;
+              background-color: #ffffff;
+              border: 1px solid #e5e7eb;
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            "
+          >
+            <div style="background-color: #f8fafb; padding: 20px; border-bottom: 1px solid #e5e7eb">
+              <h3
+                style="
+                  color: #09246c;
+                  font-size: 16px;
+                  font-weight: 400;
+                  margin: 0;
+                  letter-spacing: 0.3px;
+                "
+              >
+                Billing Information
+              </h3>
+            </div>
+            <div style="padding: 20px">
+              <div style="margin-bottom: 12px">
+                <span
+                  style="
+                    color: #374151;
+                    font-size: 13px;
+                    font-weight: 500;
+                    display: block;
+                    margin-bottom: 4px;
+                  "
+                  >Name</span
+                >
+                <span style="color: #6b7280; font-size: 14px">{{to_name}}</span>
+              </div>
+              <div style="margin-bottom: 12px">
+                <span
+                  style="
+                    color: #374151;
+                    font-size: 13px;
+                    font-weight: 500;
+                    display: block;
+                    margin-bottom: 4px;
+                  "
+                  >Address</span
+                >
+                <span style="color: #6b7280; font-size: 14px">{{address}}</span>
+              </div>
+              <div style="margin-bottom: 12px">
+                <span
+                  style="
+                    color: #374151;
+                    font-size: 13px;
+                    font-weight: 500;
+                    display: block;
+                    margin-bottom: 4px;
+                  "
+                  >Email</span
+                >
+                <span style="color: #6b7280; font-size: 14px">{{email}}</span>
+              </div>
+              <div>
+                <span
+                  style="
+                    color: #374151;
+                    font-size: 13px;
+                    font-weight: 500;
+                    display: block;
+                    margin-bottom: 4px;
+                  "
+                  >Phone</span
+                >
+                <span style="color: #6b7280; font-size: 14px">{{phone}}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Method Card -->
+          <div
+            style="
+              flex: 1;
+              min-width: 300px;
+              background-color: #ffffff;
+              border: 1px solid #e5e7eb;
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            "
+          >
+            <div style="background-color: #f8fafb; padding: 20px; border-bottom: 1px solid #e5e7eb">
+              <h3
+                style="
+                  color: #09246c;
+                  font-size: 16px;
+                  font-weight: 400;
+                  margin: 0;
+                  letter-spacing: 0.3px;
+                "
+              >
+                Payment Method
+              </h3>
+            </div>
+            <div style="padding: 20px">
+              <p style="color: #6b7280; font-size: 14px">
+                <span>SkillsFuture Credit ( Only for SFC courses ) </span>
+                <br />
+                <span>
+                  After you place the order, download the order email in pdf format as supporting
+                  document. Then you goto mySkillsFuture website to submite your SFC claim. Once the
+                  claim is approved, SSG will pay us, you don't need to pay upfront.
+                </span>
+                <br />
+                <span>
+                  Please search the course using the course code and claim the full ammount with the
+                  GST. If you have insufficent SFC funding, you can pay the balance before or on the
+                  course day.
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course Items Table -->
+        <div
+          style="
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+          "
+        >
+          <div style="background-color: #f8fafb; padding: 20px; border-bottom: 1px solid #e5e7eb">
+            <h3
+              style="
+                color: #09246c;
+                font-size: 16px;
+                font-weight: 400;
+                margin: 0;
+                letter-spacing: 0.3px;
+              "
+            >
+              Course Items
+            </h3>
+          </div>
+          <div style="padding: 0">
+            <table style="width: 100%; border-collapse: collapse">
+              <thead>
+                <tr style="background-color: #f9fafb">
+                  <th
+                    style="
+                      padding: 16px;
+                      text-align: left;
+                      font-weight: 500;
+                      color: #374151;
+                      font-size: 13px;
+                      border-bottom: 1px solid #e5e7eb;
+                      width: 50%;
+                    "
+                  >
+                    Course Information
+                  </th>
+                  <th
+                    style="
+                      padding: 16px;
+                      text-align: left;
+                      font-weight: 500;
+                      color: #374151;
+                      font-size: 13px;
+                      border-bottom: 1px solid #e5e7eb;
+                      width: 20%;
+                    "
+                  >
+                    Course Code
+                  </th>
+                  <th
+                    style="
+                      padding: 16px;
+                      text-align: center;
+                      font-weight: 500;
+                      color: #374151;
+                      font-size: 13px;
+                      border-bottom: 1px solid #e5e7eb;
+                      width: 15%;
+                    "
+                  >
+                    Pax
+                  </th>
+                  <th
+                    style="
+                      padding: 16px;
+                      text-align: right;
+                      font-weight: 500;
+                      color: #374151;
+                      font-size: 13px;
+                      border-bottom: 1px solid #e5e7eb;
+                      width: 15%;
+                    "
+                  >
+                    Subtotal
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td
+                    style="
+                      padding: 16px;
+                      border-bottom: 1px solid #f3f4f6;
+                      color: #374151;
+                      font-size: 14px;
+                    "
+                  >
+                    <p style="font-weight: bold; font-size: 16px">{{course}}</p>
+
+                    <p>
+                      <span style="font-weight: bold; font-size: 16px"> Mode of Training </span>
+                      <br />
+                      <span style="padding-left: 2rem">{{mode_of_training}}</span>
+                    </p>
+
+                    <p>
+                      <span style="font-weight: bold; font-size: 16px"> Course Start Date </span>
+                      <br />
+                      <span style="padding-left: 2rem">{{class_start_date}}</span>
+                    </p>
+
+                    <p>
+                      <span style="font-weight: bold; font-size: 16px"> Course Time </span>
+                      <br />
+                      <span style="padding-left: 2rem">{{class_time}}</span>
+                    </p>
+
+                    <p>
+                      <span style="font-weight: bold; font-size: 16px"> SponsorShip </span>
+                      <br />
+                      <span style="padding-left: 2rem">{{class_sponsorship}}</span>
+                    </p>
+
+                    <p>
+                      <span style="font-weight: bold; font-size: 16px">
+                        Name(s) on Certificate
+                      </span>
+                      <br />
+                      <span style="padding-left: 2rem">{{name_on_certificate}}</span>
+                    </p>
+                    <p>
+                      <span style="font-weight: bold; font-size: 16px">
+                        NRIC (Last 3 Digits and Alphabet)
+                      </span>
+                      <br />
+                      <span style="padding-left: 2rem">111A</span>
+                    </p>
+
+                    <p>
+                      <span style="font-weight: bold; font-size: 16px">
+                        Additional Message or Email for Course Infor
+                      </span>
+                      <br />
+                      <span style="padding-left: 2rem">{{additional_info}}</span>
+                    </p>
+                  </td>
+                  <td
+                    style="
+                      padding: 16px;
+                      border-bottom: 1px solid #f3f4f6;
+                      color: #374151;
+                      font-size: 14px;
+                    "
+                  >
+                    {{course_code}}
+                  </td>
+                  <td
+                    style="
+                      padding: 16px;
+                      border-bottom: 1px solid #f3f4f6;
+                      text-align: center;
+                      color: #374151;
+                      font-size: 14px;
+                    "
+                  >
+                    {{pax}}
+                  </td>
+                  <td
+                    style="
+                      padding: 16px;
+                      border-bottom: 1px solid #f3f4f6;
+                      text-align: right;
+                      color: #374151;
+                      font-size: 14px;
+                    "
+                  >
+                    {{course_price}}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Payment Summary -->
+        <div
+          style="
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          "
+        >
+          <div style="background-color: #f8fafb; padding: 20px; border-bottom: 1px solid #e5e7eb">
+            <h3
+              style="
+                color: #09246c;
+                font-size: 16px;
+                font-weight: 400;
+                margin: 0;
+                letter-spacing: 0.3px;
+              "
+            >
+              Payment Summary
+            </h3>
+          </div>
+          <div style="padding: 20px">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr>
+                <td
+                  style="
+                    padding: 8px 0;
+                    text-align: right;
+                    color: #6b7280;
+                    font-size: 14px;
+                    width: 70%;
+                  "
+                >
+                  Subtotal:
+                </td>
+                <td
+                  style="
+                    padding: 8px 0;
+                    text-align: right;
+                    color: #374151;
+                    font-size: 14px;
+                    width: 30%;
+                  "
+                >
+                  {{subtotal}}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; text-align: right; color: #6b7280; font-size: 14px">
+                  Grand Total (Excl. Tax):
+                </td>
+                <td style="padding: 8px 0; text-align: right; color: #374151; font-size: 14px">
+                  {{grand_total_excl_tax}}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; text-align: right; color: #6b7280; font-size: 14px">
+                  GST ({{gst_percentage}}%):
+                </td>
+                <td style="padding: 8px 0; text-align: right; color: #374151; font-size: 14px">
+                  {{gst_amount}}
+                </td>
+              </tr>
+              <tr style="border-top: 2px solid #e5e7eb">
+                <td
+                  style="
+                    padding: 16px 0 8px;
+                    text-align: right;
+                    color: #09246c;
+                    font-size: 16px;
+                    font-weight: 500;
+                  "
+                >
+                  Final Total:
+                </td>
+                <td
+                  style="
+                    padding: 16px 0 8px;
+                    text-align: right;
+                    color: #09246c;
+                    font-size: 16px;
+                    font-weight: 500;
+                  "
+                >
+                  {{final_total}}
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div
+        style="
+          background-color: #f8fafb;
+          padding: 30px;
+          text-align: center;
+          border-top: 1px solid #e5e7eb;
+        "
+      >
+        <p style="color: #6b7280; font-size: 12px; margin: 0; line-height: 1.5">
+          Thank you for choosing LionMarks Singapore.<br />
+          If you have any questions, please don't hesitate to contact us.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

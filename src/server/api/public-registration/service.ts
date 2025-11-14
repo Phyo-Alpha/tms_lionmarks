@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import type { Database } from "@/server/api";
 import type { PublicRegistrationModel } from "./model";
 import { LearnerService } from "@/server/api/learners/service";
@@ -65,15 +67,33 @@ export abstract class PublicRegistrationService {
         status: "enrolled",
       });
 
+      // Fetch full registration details with course info for email
+      const registrationDetails = await RegistrationService.getById(db, registration.id);
+
       try {
+        const htmlContent = await this.getConfirmationEmailHtml({
+          firstName,
+          lastName,
+          email,
+          phone: phoneWithCountryCode,
+          address,
+          registration,
+          course: registrationDetails.course
+            ? {
+                id: registrationDetails.course.id,
+                code: registrationDetails.course.code,
+                title: registrationDetails.course.title,
+                startDate: registrationDetails.course.startDate ?? null,
+                endDate: registrationDetails.course.endDate ?? null,
+              }
+            : undefined,
+          classStartDate,
+        });
+
         await Emailer.sendEmail({
           to: email,
           subject: "Workshop Registration Confirmation",
-          text: this.getConfirmationEmailText({
-            firstName,
-            lastName,
-            courseId,
-          }),
+          html: htmlContent,
         });
       } catch (error) {
         console.error("Failed to send confirmation email:", error);
@@ -90,20 +110,82 @@ export abstract class PublicRegistrationService {
     }
   }
 
-  private static getConfirmationEmailText(params: {
+  private static async getConfirmationEmailHtml(params: {
     firstName: string;
     lastName: string;
-    courseId: string;
-  }): string {
-    return `Hello ${params.firstName} ${params.lastName},
+    email: string;
+    phone: string;
+    address: string;
+    registration: { id: string; registeredAt: Date };
+    course?: {
+      id: string;
+      code: string;
+      title: string;
+      startDate: Date | null;
+      endDate: Date | null;
+    };
+    classStartDate?: Date;
+  }): Promise<string> {
+    const templatePath = path.join(
+      process.cwd(),
+      "src/server/api/public-registration/template/email-template.html",
+    );
 
-Thank you for registering for our workshop!
+    let template = fs.readFileSync(templatePath, "utf-8");
 
-We have received your registration and will contact you shortly regarding a $30 refundable deposit. This deposit will be returned upon course completion.
+    const toName = `${params.firstName} ${params.lastName}`;
+    const todayDate = new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    const orderNumber = params.registration.id.slice(0, 8).toUpperCase();
+    const courseName = params.course?.title || "Course";
+    const courseCode = params.course?.code || "";
+    const classStartDate = params.classStartDate
+      ? params.classStartDate.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : params.course?.startDate
+        ? new Date(params.course.startDate).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        : "TBD";
 
-If you have any questions, please don't hesitate to contact us.
+    // Replace template variables
+    const replacements: Record<string, string> = {
+      "{{to_name}}": toName,
+      "{{today_date}}": todayDate,
+      "{{order_number}}": orderNumber,
+      "{{email}}": params.email,
+      "{{address}}": params.address,
+      "{{phone}}": params.phone,
+      "{{course}}": courseName,
+      "{{course_code}}": courseCode,
+      "{{pax}}": "1",
+      "{{course_price}}": "$0.00", // Default since pricing not in schema
+      "{{mode_of_training}}": "Face-to-Face", // Default value
+      "{{class_start_date}}": classStartDate,
+      "{{class_time}}": "TBD", // Not available in schema
+      "{{class_sponsorship}}": "SkillsFuture Credit", // Default value
+      "{{name_on_certificate}}": toName,
+      "{{additional_info}}": "N/A",
+      "{{subtotal}}": "$0.00",
+      "{{grand_total_excl_tax}}": "$0.00",
+      "{{gst_percentage}}": "8",
+      "{{gst_amount}}": "$0.00",
+      "{{final_total}}": "$0.00",
+    };
 
-Best regards,
-Workshop Team`;
+    // Replace all template variables
+    for (const [key, value] of Object.entries(replacements)) {
+      template = template.replaceAll(key, value);
+    }
+
+    return template;
   }
 }
