@@ -2,33 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/client/components/ui/alert-dialog";
 import { Badge } from "@/client/components/ui/badge";
 import { Button } from "@/client/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/client/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/client/components/ui/select";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   useReactTable,
@@ -55,10 +30,12 @@ import {
 } from "@/client/features/admin/registrations";
 import { eden } from "@/client/lib/eden";
 import DataTable from "@/client/components/common/data-table";
+import { DataTableFilters } from "@/client/components/common/data-table-filters";
+import { FormDialog } from "@/client/components/common/form-dialog";
+import { ConfirmDialog } from "@/client/components/common/confirm-dialog";
 import { Page } from "@/client/components/layout/page";
 import { Typography } from "@/client/components/common/typography";
 import { Stack } from "@/client/components/layout/stack";
-import { Row } from "@/client/components/layout/row";
 
 const LIMIT_OPTIONS = [10, 20, 50] as const;
 const STATUS_OPTIONS = [
@@ -364,7 +341,7 @@ export default function RegistrationsPage() {
   );
 
   return (
-    <Page className="mx-auto w-full max-w-7xl p-6 lg:p-8">
+    <Page>
       <Stack>
         <div className="flex flex-col gap-2">
           <Typography.H1>Course registrations</Typography.H1>
@@ -375,119 +352,54 @@ export default function RegistrationsPage() {
         </div>
 
         <div className="flex flex-col gap-4 rounded-lg border bg-background p-4 shadow-sm">
-          <Row gap="between" className="flex-wrap">
-            <Row className="flex-1 flex-wrap gap-3">
-              <Select
-                value={filters.courseId ?? "all"}
-                onValueChange={(value) => {
-                  setFilters({
-                    courseId: value === "all" ? undefined : value,
-                    page: 1,
-                  });
-                }}
-              >
-                <SelectTrigger className="w-[220px]">
-                  <SelectValue placeholder="Course" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All courses</SelectItem>
-                  {courseOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={filters.learnerId ?? "all"}
-                onValueChange={(value) => {
-                  setFilters({
-                    learnerId: value === "all" ? undefined : value,
-                    page: 1,
-                  });
-                }}
-              >
-                <SelectTrigger className="w-[220px]">
-                  <SelectValue placeholder="Learner" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All learners</SelectItem>
-                  {learnerOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={statusFilterValue}
-                onValueChange={(value) => {
-                  setFilters({
-                    status: value === "all" ? undefined : value,
-                    page: 1,
-                  });
-                }}
-              >
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {STATUS_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={String(filters.limit ?? 10)}
-                onValueChange={(value) => {
-                  setFilters({
-                    limit: Number(value),
-                    page: 1,
-                  });
-                }}
-              >
-                <SelectTrigger className="w-[120px]">
-                  <SelectValue placeholder="Rows" />
-                </SelectTrigger>
-                <SelectContent>
-                  {LIMIT_OPTIONS.map((option) => (
-                    <SelectItem key={option} value={String(option)}>
-                      {option} / page
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Row>
-            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-              <DialogTrigger asChild>
-                <Button>Register learner</Button>
-              </DialogTrigger>
-              <DialogContent className="max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Enroll learner to course</DialogTitle>
-                  <DialogDescription>
-                    Select a learner and course to create a new enrolment record. Capacity and
-                    conflicts will be validated before saving.
-                  </DialogDescription>
-                </DialogHeader>
-                <RegistrationForm
-                  learners={learnerOptions}
-                  courses={courseOptions}
-                  courseMeta={courseMeta}
-                  onSubmit={handleCreateRegistration}
-                  onCancel={() => setIsCreateOpen(false)}
-                  submitLabel={
-                    createRegistrationMutation.isPending ? "Creating…" : "Create registration"
-                  }
-                />
-              </DialogContent>
-            </Dialog>
-          </Row>
+          <DataTableFilters
+            filters={[
+              {
+                type: "select",
+                key: "courseId",
+                placeholder: "Course",
+                options: [{ label: "All courses", value: "all" }, ...courseOptions],
+                value: filters.courseId ?? "all",
+                onChange: (value) =>
+                  setFilters({ courseId: value === "all" ? undefined : value, page: 1 }),
+                className: "w-[220px]",
+              },
+              {
+                type: "select",
+                key: "learnerId",
+                placeholder: "Learner",
+                options: [{ label: "All learners", value: "all" }, ...learnerOptions],
+                value: filters.learnerId ?? "all",
+                onChange: (value) =>
+                  setFilters({ learnerId: value === "all" ? undefined : value, page: 1 }),
+                className: "w-[220px]",
+              },
+              {
+                type: "select",
+                key: "status",
+                placeholder: "Status",
+                options: STATUS_OPTIONS.map((item) => ({ label: item.label, value: item.value })),
+                value: statusFilterValue,
+                onChange: (value) =>
+                  setFilters({ status: value === "all" ? undefined : value, page: 1 }),
+                className: "w-[160px]",
+              },
+              {
+                type: "select",
+                key: "limit",
+                placeholder: "Rows",
+                options: LIMIT_OPTIONS.map((option) => ({
+                  label: `${option} / page`,
+                  value: String(option),
+                })),
+                value: String(filters.limit ?? 10),
+                onChange: (value) => setFilters({ limit: Number(value), page: 1 }),
+                className: "w-[120px]",
+              },
+            ]}
+            onCreateClick={() => setIsCreateOpen(true)}
+            createButtonLabel="Register learner"
+          />
 
           <DataTable
             table={table}
@@ -500,72 +412,64 @@ export default function RegistrationsPage() {
         </div>
       </Stack>
 
-      <Dialog
+      <FormDialog
+        open={isCreateOpen}
+        onOpenChange={setIsCreateOpen}
+        title="Enroll learner to course"
+        description="Select a learner and course to create a new enrolment record. Capacity and conflicts will be validated before saving."
+      >
+        <RegistrationForm
+          learners={learnerOptions}
+          courses={courseOptions}
+          courseMeta={courseMeta}
+          onSubmit={handleCreateRegistration}
+          onCancel={() => setIsCreateOpen(false)}
+          submitLabel={createRegistrationMutation.isPending ? "Creating…" : "Create registration"}
+        />
+      </FormDialog>
+
+      <FormDialog
         open={Boolean(editingRegistration)}
         onOpenChange={(open) => !open && setEditingRegistration(null)}
+        title="Edit registration"
+        description="Update enrolment status, completion details, or supporting notes."
       >
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit registration</DialogTitle>
-            <DialogDescription>
-              Update enrolment status, completion details, or supporting notes.
-            </DialogDescription>
-          </DialogHeader>
-          {editingRegistration && (
-            <RegistrationForm
-              learners={learnerOptions}
-              courses={courseOptions}
-              courseMeta={courseMeta}
-              initialValues={{
-                learnerId: editingRegistration.learnerId,
-                courseId: editingRegistration.courseId,
-                status: editingRegistration.status,
-                registeredAt: editingRegistration.registeredAt
-                  ? new Date(editingRegistration.registeredAt)
-                  : null,
-                completedAt: editingRegistration.completedAt
-                  ? new Date(editingRegistration.completedAt)
-                  : null,
-                score: editingRegistration.score ?? undefined,
-                certificateUrl: editingRegistration.certificateUrl ?? "",
-                notes: editingRegistration.notes ?? "",
-              }}
-              onSubmit={handleUpdateRegistration}
-              onCancel={() => setEditingRegistration(null)}
-              submitLabel={
-                updateRegistrationMutation.isPending ? "Updating…" : "Update registration"
-              }
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+        {editingRegistration && (
+          <RegistrationForm
+            learners={learnerOptions}
+            courses={courseOptions}
+            courseMeta={courseMeta}
+            initialValues={{
+              learnerId: editingRegistration.learnerId,
+              courseId: editingRegistration.courseId,
+              status: editingRegistration.status,
+              registeredAt: editingRegistration.registeredAt
+                ? new Date(editingRegistration.registeredAt)
+                : null,
+              completedAt: editingRegistration.completedAt
+                ? new Date(editingRegistration.completedAt)
+                : null,
+              score: editingRegistration.score ?? undefined,
+              certificateUrl: editingRegistration.certificateUrl ?? "",
+              notes: editingRegistration.notes ?? "",
+            }}
+            onSubmit={handleUpdateRegistration}
+            onCancel={() => setEditingRegistration(null)}
+            submitLabel={updateRegistrationMutation.isPending ? "Updating…" : "Update registration"}
+          />
+        )}
+      </FormDialog>
 
-      <AlertDialog
+      <ConfirmDialog
         open={Boolean(deleteTarget)}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete registration</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will remove the enrolment record. Ensure completion evidence is archived before
-              deleting.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteRegistrationMutation.isPending}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-white hover:bg-destructive/90"
-              onClick={handleDeleteRegistration}
-              disabled={deleteRegistrationMutation.isPending}
-            >
-              {deleteRegistrationMutation.isPending ? "Deleting…" : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        title="Delete registration"
+        description="This will remove the enrolment record. Ensure completion evidence is archived before deleting."
+        confirmLabel="Delete"
+        onConfirm={handleDeleteRegistration}
+        isLoading={deleteRegistrationMutation.isPending}
+        variant="destructive"
+      />
     </Page>
   );
 }

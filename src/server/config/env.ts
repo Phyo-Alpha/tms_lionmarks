@@ -48,6 +48,11 @@ const envSchema = z.object({
   S3_ACCESS_KEY_ID: z.string().optional(),
   S3_SECRET_ACCESS_KEY: z.string().optional(),
   S3_BUCKET_NAME: z.string().optional(),
+  // SSG TPGateway API Configuration (Optional)
+  SSG_API_URL: z.string().optional(),
+  SSG_API_KEY: z.string().optional(),
+  SSG_PRIVATE_KEY_PATH: z.string().optional(),
+  SSG_PUBLIC_KEY_PATH: z.string().optional(),
 });
 
 const env = envSchema.parse(process.env);

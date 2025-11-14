@@ -20,7 +20,7 @@ export const TopBar = ({ variant = "user" }: TopBarProps) => {
     <LoginContainer
       as="header"
       paddingOnly={true}
-      className="flex items-center justify-between py-5 2.5xl:py-6 bg-sbf-white shadow-md relative z-10"
+      className="flex items-center justify-between py-5 2.5xl:py-6 bg-card shadow-md relative z-10"
     >
       <Link href="/login">
         <Image src={TOP_BAR_CONTENT.logo} width={200} height={100} alt="Company Logo" />

@@ -75,7 +75,7 @@ export default function PasswordResetPage() {
 
         <div className="flex flex-row flex-1 overflow-hidden">
           {/* LEFT - LOGIN SECTION */}
-          <LoginFormSection className="bg-sbf-off-white">
+          <LoginFormSection className="bg-background">
             <div className="flex flex-col h-full px-10 5xl:px-0 5xl:max-w-[56.25rem] 5xl:mx-auto">
               <div className="flex flex-1">
                 <div className="flex flex-col space-y-6 my-auto w-full">

@@ -96,9 +96,9 @@ function NavigationSidebarItem({ item, className }: NavigationSidebarItemProps) 
         href={item.disabled ? "#" : item.href}
         className={cn(
           "flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sbf-dark-blue focus-visible:ring-offset-2",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
           isActive
-            ? "bg-sbf-dark-blue text-white shadow-sm hover:bg-sbf-dark-blue/95"
+            ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/95"
             : "text-foreground hover:bg-slate-100 hover:text-foreground",
           item.disabled && "pointer-events-none opacity-50 cursor-not-allowed"
         )}

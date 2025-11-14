@@ -74,7 +74,7 @@ export const InfoBox = ({
     <div
       className={cn(
         "flex items-start rounded-lg border-2 space-x-3 sm:space-x-6 p-3 sm:p-5 lg:mx-10",
-        isWarning ? " bg-sbf-pale-red border-sbf-red" : " bg-sbf-pale-blue border-sbf-dark-blue  ",
+        isWarning ? " bg-destructive/10 border-destructive" : " bg-accent border-primary  ",
         className,
       )}
     >

@@ -18,7 +18,7 @@ export const UnderlinedLink = ({ href, children, className, onClick }: Underline
           onClick();
         }}
         className={cn(
-          "border-b border-black w-fit p text-sbf-dark-blue hover:cursor-pointer",
+          "border-b border-black w-fit p text-primary hover:cursor-pointer",
           className,
         )}
       >
@@ -31,7 +31,7 @@ export const UnderlinedLink = ({ href, children, className, onClick }: Underline
     <Link
       href={href}
       className={cn(
-        "border-b border-black w-fit p text-sbf-dark-blue hover:cursor-pointer",
+        "border-b border-black w-fit p text-primary hover:cursor-pointer",
         className,
       )}
     >

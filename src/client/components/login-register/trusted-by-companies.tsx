@@ -28,7 +28,7 @@ const CONTENT = {
 export const TrustedByCompanies = () => {
   return (
     <div className="h-[11rem] 2.5xl:h-[12rem] 3xl:h-[14rem] 4xl:h-[15rem] pb-10">
-      <p className="text-center text-sbf-medum-dark-gray">{CONTENT.trustedByText}</p>
+      <p className="text-center text-muted-foreground">{CONTENT.trustedByText}</p>
       <div className="flex justify-center items-center sm:gap-8 mb-1 3xl:mb-2">
         {TRUSTED_BY_COMPANIES.map((company) => (
           <div key={company.id} className=" h-full sm:h-20 2xl:h-[5.5rem] 3xl:h-28">

@@ -31,7 +31,7 @@ export function CourseCard({ course, onEdit, onDelete, className }: CourseCardPr
       )}
     >
       {/* Header with gradient background */}
-      <div className="relative min-h-54 bg-gradient-to-br from-sbf-dark-blue to-sbf-teal-blue flex items-center justify-center">
+      <div className="relative min-h-54 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
         <GraduationCap className="h-16 w-16 text-white/20" />
         <div className="absolute top-3 right-3">
           <Badge

@@ -64,7 +64,7 @@ export default function AdminLoginPage() {
         <TopBar variant="admin" />
 
         <div className="flex flex-row flex-1 overflow-hidden">
-          <LoginFormSection className="bg-gradient-to-r from-sbf-dark-blue to-sbf-teal-blue">
+          <LoginFormSection className="bg-gradient-to-r from-primary to-secondary">
             <LoginContainer className="flex flex-col h-full mt-8">
               <div className="flex flex-1">
                 <div className="flex flex-col space-y-1 my-auto w-full">
@@ -107,7 +107,7 @@ export default function AdminLoginPage() {
 
                         <div className="flex items-center">
                           <hr className="w-full" />
-                          <p className="  text-sbf-cyan-blue font-bold px-3 ">OR</p>
+                          <p className="  text-secondary font-bold px-3 ">OR</p>
                           <hr className="w-full" />
                         </div>
 

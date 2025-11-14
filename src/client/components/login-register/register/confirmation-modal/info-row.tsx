@@ -7,7 +7,7 @@ type InfoRowProps = {
 
 export function InfoRow({ label, value }: InfoRowProps) {
   return (
-    <div className="flex flex-col space-y-2 standardRoundness bg-sbf-pale-blue  border border-sbf-dark-blue p-4 2.5xl:p-5">
+    <div className="flex flex-col space-y-2 standardRoundness bg-accent  border border-primary p-4 2.5xl:p-5">
       <p className="">{label}</p>
       <h3 className="">{value || "-"}</h3>
     </div>

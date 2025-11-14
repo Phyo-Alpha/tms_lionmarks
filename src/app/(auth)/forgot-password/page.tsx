@@ -55,7 +55,7 @@ export default function ForgotPasswordPage() {
         <TopBar />
 
         <div className="flex flex-row flex-1 overflow-hidden">
-          <LoginFormSection className="bg-sbf-off-white">
+          <LoginFormSection className="bg-background">
             <LoginContainer className="flex flex-col h-full pb-24">
               <div className="flex flex-1 ">
                 <div className="flex flex-col space-y-6 my-auto w-full">

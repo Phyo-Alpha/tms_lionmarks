@@ -13,7 +13,7 @@ export const PaginationDots = ({ total, active }: PaginationDotsProps) => {
           key={i}
           className={
             i === active
-              ? "size-2.5 rounded-full bg-sbf-dark-blue"
+              ? "size-2.5 rounded-full bg-primary"
               : "size-2.5 rounded-full bg-gray-300"
           }
         />

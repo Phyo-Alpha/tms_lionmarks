@@ -2,35 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/client/components/ui/alert-dialog";
 import { Badge } from "@/client/components/ui/badge";
 import { Button } from "@/client/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTrigger,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/client/components/ui/dialog";
-import { Input } from "@/client/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/client/components/ui/select";
+import { DialogFooter } from "@/client/components/ui/dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   useReactTable,
@@ -52,10 +26,12 @@ import {
 import { eden } from "@/client/lib/eden";
 import { LearnerForm, type LearnerFormValues } from "@/client/features/admin/learners";
 import DataTable from "@/client/components/common/data-table";
+import { DataTableFilters } from "@/client/components/common/data-table-filters";
+import { FormDialog } from "@/client/components/common/form-dialog";
+import { ConfirmDialog } from "@/client/components/common/confirm-dialog";
 import { Page } from "@/client/components/layout/page";
 import { Typography } from "@/client/components/common/typography";
 import { Stack } from "@/client/components/layout/stack";
-import { Row } from "@/client/components/layout/row";
 
 const STATUSES = [
   { label: "All statuses", value: "all" },
@@ -304,7 +280,7 @@ export default function LearnersPage() {
   );
 
   return (
-    <Page className="mx-auto w-full max-w-7xl p-6 lg:p-8">
+    <Page>
       <Stack>
         <div className="flex flex-col gap-2">
           <Typography.H1>Learners</Typography.H1>
@@ -315,80 +291,41 @@ export default function LearnersPage() {
         </div>
 
         <div className="flex flex-col gap-4 rounded-lg border bg-background p-4 shadow-sm">
-          <Row gap="between" className="flex-wrap">
-            <Row className="flex-1 flex-wrap gap-3">
-              <Input
-                className="max-w-xs"
-                value={filters.search ?? ""}
-                placeholder="Search by name, email, or organization"
-                onChange={(event) =>
-                  setFilters({
-                    search: event.target.value ? event.target.value : undefined,
-                    page: 1,
-                  })
-                }
-              />
-              <Select
-                value={selectedStatus}
-                onValueChange={(value) => {
-                  setFilters({
-                    status: value === "all" ? undefined : value,
-                    page: 1,
-                  });
-                }}
-              >
-                <SelectTrigger className="w-[160px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {STATUSES.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select
-                value={String(filters.limit ?? 10)}
-                onValueChange={(value) => {
-                  setFilters({
-                    limit: Number(value),
-                    page: 1,
-                  });
-                }}
-              >
-                <SelectTrigger className="w-[120px]">
-                  <SelectValue placeholder="Rows" />
-                </SelectTrigger>
-                <SelectContent>
-                  {LIMIT_OPTIONS.map((option) => (
-                    <SelectItem key={option} value={String(option)}>
-                      {option} / page
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Row>
-            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-              <DialogTrigger asChild>
-                <Button>Create learner</Button>
-              </DialogTrigger>
-              <DialogContent className="max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Add learner</DialogTitle>
-                  <DialogDescription>
-                    Provide basic profile details. Learners can be enrolled into courses after
-                    creation.
-                  </DialogDescription>
-                </DialogHeader>
-                <LearnerForm
-                  onSubmit={handleCreateLearner}
-                  onCancel={() => setIsCreateOpen(false)}
-                  submitLabel={createLearnerMutation.isPending ? "Creating…" : "Create learner"}
-                />
-              </DialogContent>
-            </Dialog>
-          </Row>
+          <DataTableFilters
+            filters={[
+              {
+                type: "search",
+                key: "search",
+                placeholder: "Search by name, email, or organization",
+                value: filters.search ?? "",
+                onChange: (value) => setFilters({ search: value, page: 1 }),
+              },
+              {
+                type: "select",
+                key: "status",
+                placeholder: "Status",
+                options: STATUSES.map((item) => ({ label: item.label, value: item.value })),
+                value: selectedStatus,
+                onChange: (value) =>
+                  setFilters({ status: value === "all" ? undefined : value, page: 1 }),
+                className: "w-[160px]",
+              },
+              {
+                type: "select",
+                key: "limit",
+                placeholder: "Rows",
+                options: LIMIT_OPTIONS.map((option) => ({
+                  label: `${option} / page`,
+                  value: String(option),
+                })),
+                value: String(filters.limit ?? 10),
+                onChange: (value) => setFilters({ limit: Number(value), page: 1 }),
+                className: "w-[120px]",
+              },
+            ]}
+            onCreateClick={() => setIsCreateOpen(true)}
+            createButtonLabel="Create learner"
+          />
 
           <DataTable
             table={table}
@@ -401,67 +338,62 @@ export default function LearnersPage() {
         </div>
       </Stack>
 
-      <Dialog
+      <FormDialog
+        open={isCreateOpen}
+        onOpenChange={setIsCreateOpen}
+        title="Add learner"
+        description="Provide basic profile details. Learners can be enrolled into courses after creation."
+      >
+        <LearnerForm
+          onSubmit={handleCreateLearner}
+          onCancel={() => setIsCreateOpen(false)}
+          submitLabel={createLearnerMutation.isPending ? "Creating…" : "Create learner"}
+        />
+      </FormDialog>
+
+      <FormDialog
         open={Boolean(editingLearner)}
         onOpenChange={(open) => !open && setEditingLearner(null)}
+        title="Edit learner"
+        description="Update profile details for this learner."
       >
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit learner</DialogTitle>
-            <DialogDescription>Update profile details for this learner.</DialogDescription>
-          </DialogHeader>
-          {editingLearner && (
-            <>
-              <LearnerForm
-                initialValues={{
-                  firstName: editingLearner.firstName,
-                  lastName: editingLearner.lastName,
-                  email: editingLearner.email,
-                  phone: editingLearner.phone ?? "",
-                  organization: editingLearner.organization ?? "",
-                  status: editingLearner.status,
-                  metadata: editingLearner.metadata ?? "",
-                }}
-                onSubmit={handleUpdateLearner}
-                onCancel={() => setEditingLearner(null)}
-                submitLabel={updateLearnerMutation.isPending ? "Updating..." : "Update learner"}
-              />
-              {editingLearner.metadata && (
-                <DialogFooter>
-                  <span className="text-xs text-muted-foreground">
-                    Notes: {editingLearner.metadata}
-                  </span>
-                </DialogFooter>
-              )}
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+        {editingLearner && (
+          <>
+            <LearnerForm
+              initialValues={{
+                firstName: editingLearner.firstName,
+                lastName: editingLearner.lastName,
+                email: editingLearner.email,
+                phone: editingLearner.phone ?? "",
+                organization: editingLearner.organization ?? "",
+                status: editingLearner.status,
+                metadata: editingLearner.metadata ?? "",
+              }}
+              onSubmit={handleUpdateLearner}
+              onCancel={() => setEditingLearner(null)}
+              submitLabel={updateLearnerMutation.isPending ? "Updating..." : "Update learner"}
+            />
+            {editingLearner.metadata && (
+              <DialogFooter>
+                <span className="text-xs text-muted-foreground">
+                  Notes: {editingLearner.metadata}
+                </span>
+              </DialogFooter>
+            )}
+          </>
+        )}
+      </FormDialog>
 
-      <AlertDialog
+      <ConfirmDialog
         open={Boolean(deleteTarget)}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete learner</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently remove the learner record. Registrations must be withdrawn
-              before deletion.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteLearnerMutation.isPending}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-white hover:bg-destructive/90"
-              onClick={handleDeleteLearner}
-              disabled={deleteLearnerMutation.isPending}
-            >
-              {deleteLearnerMutation.isPending ? "Deleting…" : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        title="Delete learner"
+        description="This will permanently remove the learner record. Registrations must be withdrawn before deletion."
+        confirmLabel="Delete"
+        onConfirm={handleDeleteLearner}
+        isLoading={deleteLearnerMutation.isPending}
+        variant="destructive"
+      />
     </Page>
   );
 }

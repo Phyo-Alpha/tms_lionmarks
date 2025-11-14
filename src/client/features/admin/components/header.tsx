@@ -15,7 +15,7 @@ function AdminHeader() {
       as="header"
       paddingOnly={true}
       className={cn(
-        "flex items-center justify-between py-5 2.5xl:py-6 bg-sbf-dark-blue shadow-md relative z-10",
+        "flex items-center justify-between py-5 2.5xl:py-6 bg-primary shadow-md relative z-10",
       )}
     >
       <Link href="/admin" className="flex items-center">
@@ -31,10 +31,10 @@ function AdminHeader() {
       <div>
         <Link
           href={HEADER_CONTENT.profileHref}
-          className="flex items-center justify-center p-2 rounded-full transition-all hover:bg-sbf-teal-blue/20 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-sbf-teal-blue focus:ring-offset-2 focus:ring-offset-sbf-dark-blue"
+          className="flex items-center justify-center p-2 rounded-full transition-all hover:bg-secondary/20 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-primary"
           aria-label="Profile"
         >
-          <UserCircle className="w-8 h-8 2.5xl:w-10 2.5xl:h-10 text-sbf-white" />
+          <UserCircle className="w-8 h-8 2.5xl:w-10 2.5xl:h-10 text-primary-foreground" />
         </Link>
       </div>
     </LoginContainer>

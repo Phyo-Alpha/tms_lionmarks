@@ -34,7 +34,7 @@ function SelectTrigger({
     <SelectPrimitive.Trigger
       ref={ref}
       className={cn(
-        "border-input ring-offset-background placeholder:text-muted-foreground focus:ring-ring z-0 flex w-full items-center justify-between standardRoundness border bg-sbf-white px-3 py-2 p whitespace-nowrap shadow-xs focus:ring-1 focus:outline-hidden disabled:cursor-not-allowed [&>span]:line-clamp-1 inputFieldHeight",
+        "border-input ring-offset-background placeholder:text-muted-foreground focus:ring-ring z-0 flex w-full items-center justify-between standardRoundness border bg-card px-3 py-2 p whitespace-nowrap shadow-xs focus:ring-1 focus:outline-hidden disabled:cursor-not-allowed [&>span]:line-clamp-1 inputFieldHeight",
         className,
       )}
       {...props}
@@ -46,7 +46,7 @@ function SelectTrigger({
             <XIcon
               className={cn(
                 "z-10 h-6 w-6 cursor-pointer opacity-50 hover:opacity-100",
-                clearable && "border-sbf-light-gray border-r pr-2",
+                clearable && "border-input border-r pr-2",
               )}
               onClick={() => {
                 onClear?.();

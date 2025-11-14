@@ -3,11 +3,11 @@ import { cva, VariantProps } from "class-variance-authority";
 import * as React from "react";
 
 export const InputVariants = cva(
-  "flex bg-sbf-white transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed",
+  "flex bg-card transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed h-10",
   {
     variants: {
       inputBox: {
-        default: "standardRoundness border border-sbf-light-gray px-3 p",
+        default: "standardRoundness border border-input px-3 p",
       },
       inputSize: {
         default: "inputFieldHeight w-full",

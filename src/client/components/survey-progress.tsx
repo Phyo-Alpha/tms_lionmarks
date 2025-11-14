@@ -54,13 +54,13 @@ export const SurveyProgress = () => {
   const completedCount = SURVEYS.filter((survey) => survey.completionPercentage === 100).length;
 
   return (
-    <div className="border-2 border-sbf-dark-blue rounded-lg p-5 mobile-m:p-7 2.5xl:p-8 4xl:p-9 bg-white flex flex-col space-y-1 2.5xl:space-y-3 w-full">
+    <div className="border-2 border-primary rounded-lg p-5 mobile-m:p-7 2.5xl:p-8 4xl:p-9 bg-white flex flex-col space-y-1 2.5xl:space-y-3 w-full">
       <h2 className="text-center sm:text-left">{SECTION_TITLE}</h2>
       <p className="text-center sm:text-left">{SECTION_DESCRIPTION}</p>
 
       <div
         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 py-3 2.5xl:py-5 
-        [&>*]:border-b [&>*]:border-sbf-light-gray [&>*:last-child]:border-b-0
+        [&>*]:border-b [&>*]:border-input [&>*:last-child]:border-b-0
         sm:max-md:[&>*:nth-child(odd)]:border-r sm:[&>*]:border-gray-300 sm:[&>*:nth-last-child(-n+2)]:border-b-0
         md:[&>*:nth-child(3n-2)]:border-r md:[&>*:nth-child(3n-1)]:border-r md:[&>*:nth-last-child(-n+3)]:border-b-0"
       >
@@ -68,7 +68,7 @@ export const SurveyProgress = () => {
           <div key={survey.id} className="text-center p-5 flex flex-col space-y-2">
             <h3
               className={
-                survey.completionPercentage === 100 ? "text-sbf-dark-blue" : "text-sbf-red"
+                survey.completionPercentage === 100 ? "text-primary" : "text-destructive"
               }
             >
               {survey.completionPercentage === 100
@@ -101,7 +101,7 @@ export const SurveyProgress = () => {
               <div
                 key={survey.id}
                 className={`h-[0.375rem] 2.5xl:h-2 flex-1 rounded-full ${
-                  index < completedCount ? "bg-sbf-cyan-blue" : "bg-sbf-medium-gray"
+                  index < completedCount ? "bg-primary" : "bg-muted"
                 }`}
                 style={{ borderRadius: "4px" }}
               />

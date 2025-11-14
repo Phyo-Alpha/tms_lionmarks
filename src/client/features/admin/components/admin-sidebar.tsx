@@ -6,13 +6,18 @@ import {
   NavigationSidebarItem,
   type NavigationItem,
 } from "@/client/components/common/navigation";
-import { Home, Users, GraduationCap, ClipboardList, HelpCircle } from "lucide-react";
+import { Home, Users, GraduationCap, ClipboardList, HelpCircle, UserCheck } from "lucide-react";
 
 const ADMIN_NAVIGATION_ITEMS: NavigationItem[] = [
   {
     label: "Home",
     href: "/admin",
     icon: Home,
+  },
+  {
+    label: "Students",
+    href: "/admin/students",
+    icon: UserCheck,
   },
   {
     label: "Learners",

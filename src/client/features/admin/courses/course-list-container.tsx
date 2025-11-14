@@ -170,7 +170,7 @@ export function CourseListContainer() {
   };
 
   return (
-    <Page className="mx-auto w-full max-w-7xl p-6 lg:p-8">
+    <Page>
       <Stack>
         <div className="flex flex-col gap-2">
           <Typography.H1>Courses</Typography.H1>

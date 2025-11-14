@@ -8,7 +8,7 @@ import { QuestionSelect, questionSelectData } from "./registration-fields-three"
 
 export const RegistrationReview = () => {
   return (
-    <div className="flex w-full flex-col space-y-6 px-5 py-6 bg-sbf-pale-blue rounded-lg border border-sbf-light-gray">
+    <div className="flex w-full flex-col space-y-6 px-5 py-6 bg-accent rounded-lg border border-input">
       {/* Section 1 Fields - Name, Role, Organisation Name, UEN */}
       <div className="flex flex-col lg:flex-row space-y-6  lg:space-x-5 lg:space-y-0">
         <FormInput

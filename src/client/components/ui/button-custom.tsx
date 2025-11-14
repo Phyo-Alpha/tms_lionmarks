@@ -31,7 +31,7 @@ export const ButtonCustom = ({
         ref={ref as any}
         type="button"
         className={cn(
-          "flex items-center justify-center gap-2 bg-sbf-white standardRoundness px-6 py-2 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 hover:cursor-pointer hover:opacity-90",
+          "flex items-center justify-center gap-2 bg-card standardRoundness px-6 py-2 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 hover:cursor-pointer hover:opacity-90",
           className,
         )}
         {...(props as any)}
@@ -52,11 +52,11 @@ export const ButtonCustom = ({
 
   const baseClassName = cn(
     // Fixed base styles
-    "p rounded-full font-bold transition-all inline-flex items-center justify-center px-7 2.5xl:px-10 cursor-pointer border border-sbf-dark-blue text-center",
+    "p rounded-full font-bold transition-all inline-flex items-center justify-center px-7 2.5xl:px-10 cursor-pointer border border-primary text-center",
     // Bordered or filled background
     bordered
-      ? "hover:bg-sbf-pale-blue hover:shadow-lg hover:scale-[100.5%] py-1 2.5xl:py-2"
-      : "bg-sbf-dark-blue text-white hover:bg-sbf-white hover:text-sbf-dark-blue hover:shadow-lg py-2 2.5xl:py-2.5",
+      ? "hover:bg-accent hover:shadow-lg hover:scale-[100.5%] py-1 2.5xl:py-2"
+      : "bg-primary text-primary-foreground hover:bg-card hover:text-primary hover:shadow-lg py-2 2.5xl:py-2.5",
     className,
   );
 

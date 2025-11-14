@@ -7,7 +7,7 @@ import { ArrowLeft, ChevronLeft } from "lucide-react";
 const PageContainerVariants = cva("min-h-screen mx-auto", {
   variants: {
     variant: {
-      default: "px-dashboard-margin py-large",
+      default: "px-12 py-8",
       landing: "",
       form: "w-4/6 py-large",
     },
@@ -141,7 +141,7 @@ function PageHeader({
   );
 }
 
-const PageBodyVariants = cva("flex flex-col gap-20", {
+const PageBodyVariants = cva("flex flex-col gap-8", {
   variants: {
     variant: {
       default: "",

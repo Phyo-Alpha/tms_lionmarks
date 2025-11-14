@@ -9,7 +9,7 @@ export const SmartReportSection: React.FC = () => {
           className="relative grid lg:grid-cols-2 items-center p-8 rounded-2xl border-2 border-border"
           style={{
             background:
-              "linear-gradient(90deg, var(--accent) 75%, var(--color-secondary-100) 100%)",
+              "linear-gradient(90deg, var(--accent) 75%, var(--secondary) 100%)",
           }}
         >
           <header className="space-y-8">

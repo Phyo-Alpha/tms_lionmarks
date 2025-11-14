@@ -172,7 +172,7 @@ function DataTable<TData>({
   return (
     <Stack className={cn("w-full space-y-4", className)}>
       {title && <Typography.H3>{title}</Typography.H3>}
-      <div className="rounded-sm border border-actions-dividers">
+      <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
         <Table className={cn(tableClassName, "text-text-on-background-container")}>
           {showHeader && <DataTableHeader table={table} headerClassName={headerClassName} />}
           <DataTableBody
@@ -260,7 +260,7 @@ function DataTableHeader<TData>({ table, headerClassName }: DataTableProps<TData
   return (
     <TableHeader>
       {table.getHeaderGroups().map((headerGroup) => (
-        <TableRow key={headerGroup.id} className={cn(headerClassName, "border-b-actions-primary")}>
+        <TableRow key={headerGroup.id} className={cn(headerClassName, "border-b bg-gray-50/50")}>
           {headerGroup.headers.map((header) => {
             const canSort = header.column.getCanSort();
             const isSorted = header.column.getIsSorted();
@@ -269,7 +269,7 @@ function DataTableHeader<TData>({ table, headerClassName }: DataTableProps<TData
               <TableHead
                 key={header.id}
                 className={cn(
-                  "px-6 py-5 font-bold",
+                  "px-4 py-3 text-xs font-medium text-gray-600",
                   canSort && "cursor-pointer select-none",
                   headerClassName,
                 )}
@@ -284,7 +284,7 @@ function DataTableHeader<TData>({ table, headerClassName }: DataTableProps<TData
                     <span className="ml-auto">
                       {isSorted === "asc" && <ChevronUp className="size-4" />}
                       {isSorted === "desc" && <ChevronDown className="size-4" />}
-                      {!isSorted && <ChevronsUpDown />}
+                      {!isSorted && <ChevronsUpDown className="size-4" />}
                     </span>
                   )}
                 </div>
@@ -316,17 +316,12 @@ function DataTableBody<TData>({
           <TableRow
             key={row.id}
             data-state={row.getIsSelected() ? "selected" : undefined}
-            className={cn(enableRowHover && "hover:bg-muted/30", rowClassNameValue)}
+            className={cn(enableRowHover && "hover:bg-muted/50", rowClassNameValue)}
           >
             {row.getVisibleCells().map((cell) => (
               <TableCell
                 key={cell.id}
-                className={cn(
-                  cellClassName,
-                  "px-6 py-5",
-                  row.index === 0 && "bg-surfaces-primary-container", // highlight the first row
-                  cell.column.getIndex() !== 0 && row.index === 0 && "font-bold", // make the first cell in the first row bold
-                )}
+                className={cn(cellClassName, "px-4 py-3 text-sm")}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </TableCell>
@@ -340,10 +335,17 @@ function DataTableBody<TData>({
 DataTableBody.displayName = "DataTableBody";
 
 function DataTablePagination<TData>({ table, dataCount }: DataTableProps<TData>) {
+  const selectedCount = table.getFilteredSelectedRowModel().rows.length;
+  const totalCount = table.getFilteredRowModel().rows.length;
+
   return (
-    <div className="flex items-center justify-between">
-      <div className="text-muted-foreground text-sm">
-        {dataCount !== undefined ? (
+    <div className="flex items-center justify-between px-2">
+      <div className="text-sm text-gray-600">
+        {selectedCount > 0 ? (
+          <span>
+            {selectedCount} of {totalCount} row(s) selected.
+          </span>
+        ) : dataCount !== undefined ? (
           <>
             Showing{" "}
             {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{" "}
