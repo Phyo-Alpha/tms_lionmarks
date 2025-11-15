@@ -54,7 +54,7 @@ const app = new Elysia({ prefix: "/api" })
       },
       documentation: {
         info: {
-          title: "FRI Portal API Documentation",
+          title: "Lionmarks TMS Portal API Documentation",
           version: "1.0.0",
           description: `API documentation for the Future Readiness Index Portal
 ### 🧠 Developer Notes
