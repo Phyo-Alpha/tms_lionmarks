@@ -1,7 +1,7 @@
 import { callSSGAPIWithTLS } from "@/server/api/ssg/lib/ssg-tls-client";
 import z from "zod";
-import { CoursesSSGModels } from "./models";
 import { status } from "@/server/helpers/responseWrapper";
+import { CoursesSSGModels } from "./models";
 
 export abstract class CoursesSSGService {
   static async coursesCategories() {

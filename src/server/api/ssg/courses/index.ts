@@ -6,7 +6,7 @@ import { CoursesSSGService } from "./service";
 import { CoursesSSGModels } from "./models";
 
 export const coursesSSGController = new Elysia({
-  prefix: "/ssg/courses",
+  prefix: "/courses",
   detail: {
     tags: ["SSG", "Courses"],
   },

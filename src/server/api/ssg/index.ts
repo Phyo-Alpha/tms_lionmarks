@@ -1,6 +1,7 @@
 import { authMiddleware } from "@/server/lib/auth-middleware";
 import Elysia from "elysia";
 import { coursesSSGController } from "./courses";
+import { courseRunsSSGController } from "./course-runs";
 
 export const skillsFutureSSGController = new Elysia({
   prefix: "/ssg",
@@ -9,4 +10,5 @@ export const skillsFutureSSGController = new Elysia({
   },
 })
   .use(authMiddleware)
-  .use(coursesSSGController);
+  .use(coursesSSGController)
+  .use(courseRunsSSGController);

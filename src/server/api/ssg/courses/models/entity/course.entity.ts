@@ -1,48 +1,5 @@
 import { z } from "zod";
-
-/**
- * Recursively makes all fields in a Zod schema nullable and optional
- */
-function deepNullableOptional(schema: z.ZodTypeAny): z.ZodTypeAny {
-  if (schema instanceof z.ZodObject) {
-    const shape = schema.shape;
-    const newShape: Record<string, z.ZodTypeAny> = {};
-
-    for (const [key, value] of Object.entries(shape)) {
-      const unwrapped =
-        value instanceof z.ZodOptional || value instanceof z.ZodNullable
-          ? (value as z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>).unwrap()
-          : value;
-
-      if (unwrapped instanceof z.ZodObject) {
-        newShape[key] = deepNullableOptional(unwrapped).nullable().optional();
-      } else if (unwrapped instanceof z.ZodArray) {
-        const arraySchema = unwrapped as z.ZodArray<z.ZodTypeAny>;
-        newShape[key] = z.array(deepNullableOptional(arraySchema.element)).nullable().optional();
-      } else {
-        newShape[key] = unwrapped.nullable().optional();
-      }
-    }
-
-    return z.object(newShape);
-  }
-
-  if (schema instanceof z.ZodArray) {
-    const arraySchema = schema as z.ZodArray<z.ZodTypeAny>;
-    return z.array(deepNullableOptional(arraySchema.element)).nullable().optional();
-  }
-
-  const unwrapped =
-    schema instanceof z.ZodOptional || schema instanceof z.ZodNullable
-      ? (schema as z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>).unwrap()
-      : schema;
-
-  if (unwrapped instanceof z.ZodObject || unwrapped instanceof z.ZodArray) {
-    return deepNullableOptional(unwrapped).nullable().optional();
-  }
-
-  return unwrapped.nullable().optional();
-}
+import { deepNullableOptional } from "../../../lib/zod";
 
 /* ---------------------------- Reusable Schemas ---------------------------- */
 
@@ -83,7 +40,7 @@ const RunSchema = z.object({
   intakeSize: z.number(),
   postalCode: z.string(),
   scheduleInfo: z.string(),
-  courseEndDate: z.string(),
+  courseEndDate: z.coerce.string(),
   courseVacancy: CourseVacancySchema,
   modeOfTraining: z.string(),
   courseStartDate: z.number(),
@@ -147,8 +104,8 @@ const SectorSchema = z.object({
 });
 
 const SupportPeriodSchema = z.object({
-  to: z.string(),
-  from: z.string(),
+  to: z.coerce.string(),
+  from: z.coerce.string(),
   taggingCode: z.string(),
   taggingDescription: z.string(),
 });
@@ -179,7 +136,7 @@ const CategorySchema = z.object({
 const JobRoleSchema = z.object({
   code: z.string(),
   title: z.string(),
-  typeId: z.string(),
+  typeId: z.number(),
   sectorUri: z.string(),
   jobRoleUri: z.string(),
   sectorCode: z.string(),
@@ -235,7 +192,7 @@ const ProviderAddressSchema = z.object({
   block: z.string(),
   floor: z.string(),
   street: z.string(),
-  typeId: z.string(),
+  typeId: z.number(),
   building: z.string(),
   postalCode: z.string(),
 });
