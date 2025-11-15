@@ -5,6 +5,7 @@ import env from "@/server/config/env";
 interface SSGTLSRequestOptions extends Omit<RequestInit, "body"> {
   queryParams?: Record<string, string | string[]>;
   body?: unknown;
+  returnRawResponse?: boolean;
 }
 
 /**
@@ -94,6 +95,11 @@ export async function callSSGAPIWithTLS<T = unknown>(
           error.statusCode = res.statusCode;
           error.body = errorBody;
           reject(error);
+          return;
+        }
+
+        if (options.returnRawResponse) {
+          resolve(data as T);
           return;
         }
 

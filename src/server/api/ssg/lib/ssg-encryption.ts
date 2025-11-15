@@ -55,6 +55,25 @@ export function encryptSSGPayload(payload: unknown): string {
 }
 
 /**
+ * Decrypts an encrypted payload using AES-256-CBC decryption
+ * Matches the decryption method used by SSG API
+ * @param encryptedPayload - Base64 encoded encrypted string
+ * @returns Decrypted JSON string
+ */
+export function decryptSSGPayload(encryptedPayload: string): string {
+  const key = getEncryptionKey();
+  const iv = Buffer.from(IV, "utf-8");
+
+  const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
+  decipher.setAutoPadding(true);
+
+  let decrypted = decipher.update(encryptedPayload, "base64", "utf-8");
+  decrypted += decipher.final("utf-8");
+
+  return decrypted;
+}
+
+/**
  * Clears the cached encryption key
  * Useful for testing or when the key needs to be reloaded
  */
