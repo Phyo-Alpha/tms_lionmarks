@@ -42,4 +42,42 @@ export const courseRunsSSGController = new Elysia({
       }),
       response: CoursesRunsSSGModels.getCourseRunByIdResponse,
     },
+  )
+  .put(
+    "/:courseRunId",
+    async ({ params, body, user, session }) => {
+      roleCheck({ user: user as AuthContext["user"], session }, "admin");
+      const courseRunId = parseInt(params.courseRunId, 10);
+      if (isNaN(courseRunId)) {
+        throw status(400, "Invalid courseRunId");
+      }
+      return CoursesRunsSSGService.update(courseRunId, body);
+    },
+    {
+      auth: true,
+      params: z.object({
+        courseRunId: z.string(),
+      }),
+      body: CoursesRunsSSGModels.updateCourseRunDto,
+      response: CoursesRunsSSGModels.updateCourseRunResponse,
+    },
+  )
+  .delete(
+    "/:courseRunId",
+    async ({ params, body, user, session }) => {
+      roleCheck({ user: user as AuthContext["user"], session }, "admin");
+      const courseRunId = parseInt(params.courseRunId, 10);
+      if (isNaN(courseRunId)) {
+        throw status(400, "Invalid courseRunId");
+      }
+      return CoursesRunsSSGService.delete(courseRunId, body);
+    },
+    {
+      auth: true,
+      params: z.object({
+        courseRunId: z.string(),
+      }),
+      body: CoursesRunsSSGModels.deleteCourseRunDto,
+      response: CoursesRunsSSGModels.deleteCourseRunResponse,
+    },
   );

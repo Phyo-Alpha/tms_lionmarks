@@ -2,13 +2,19 @@ import { status } from "@/server/helpers/responseWrapper";
 import { CoursesRunsSSGModels } from "./models";
 import { callSSGAPIWithTLS } from "../lib/ssg-tls-client";
 import { handleSkillFutureError } from "../helper/errors";
+import { encryptSSGPayload } from "../lib/ssg-encryption";
 
 export abstract class CoursesRunsSSGService {
   static async create(dto: CoursesRunsSSGModels.CreateCourseRunRequestDto) {
     try {
+      const encryptedBody = encryptSSGPayload(dto);
+
       const response = await callSSGAPIWithTLS("/courses/courseRuns/publish", {
         method: "POST",
-        body: dto,
+        body: encryptedBody,
+        headers: {
+          "Content-Type": "text/plain",
+        },
       });
 
       const parsed = CoursesRunsSSGModels.createCourseRunResponse.parse(response);
@@ -40,6 +46,56 @@ export abstract class CoursesRunsSSGService {
       }
       console.log(err);
       throw status(500, "Server error while fetching course run");
+    }
+  }
+
+  static async update(courseRunId: number, dto: CoursesRunsSSGModels.UpdateCourseRunRequestDto) {
+    try {
+      const encryptedBody = encryptSSGPayload(dto);
+
+      const response = await callSSGAPIWithTLS(`/courses/courseRuns/edit/${courseRunId}`, {
+        method: "PUT",
+        body: encryptedBody,
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      });
+
+      const parsed = CoursesRunsSSGModels.updateCourseRunResponse.parse(response);
+      handleSkillFutureError(parsed);
+
+      return parsed;
+    } catch (err) {
+      if (err && typeof err === "object" && "status" in err) {
+        throw err;
+      }
+      console.log(err);
+      throw status(500, "Server error while updating course run");
+    }
+  }
+
+  static async delete(courseRunId: number, dto: CoursesRunsSSGModels.DeleteCourseRunRequestDto) {
+    try {
+      const encryptedBody = encryptSSGPayload(dto);
+
+      const response = await callSSGAPIWithTLS(`/courses/courseRuns/edit/${courseRunId}`, {
+        method: "PUT",
+        body: encryptedBody,
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      });
+
+      const parsed = CoursesRunsSSGModels.deleteCourseRunResponse.parse(response);
+      handleSkillFutureError(parsed);
+
+      return parsed;
+    } catch (err) {
+      if (err && typeof err === "object" && "status" in err) {
+        throw err;
+      }
+      console.log(err);
+      throw status(500, "Server error while deleting course run");
     }
   }
 }

@@ -49,7 +49,7 @@ export async function callSSGAPIWithTLS<T = unknown>(
 
   // Prepare request body
   let body: string | undefined;
-  if (options.body) {
+  if (options.body !== undefined) {
     body = typeof options.body === "string" ? options.body : JSON.stringify(options.body);
   }
 
