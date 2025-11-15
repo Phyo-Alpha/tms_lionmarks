@@ -134,7 +134,9 @@ export default function StudentsPage() {
   const [showAttendanceView, setShowAttendanceView] = useState(false);
   const [filters, setFilters] = useQueryStates(
     {
-      search: parseAsString.withDefault("").withOptions({ history: "replace", clearOnDefault: true }),
+      search: parseAsString
+        .withDefault("")
+        .withOptions({ history: "replace", clearOnDefault: true }),
       filter: parseAsString.withDefault("all").withOptions({ history: "replace" }),
     },
     { shallow: false },
@@ -238,7 +240,9 @@ export default function StudentsPage() {
                           >
                             {student.taxInvoice}
                           </Badge>
-                          {student.taxInvoice === "Done" && <Check className="size-4 text-green-600" />}
+                          {student.taxInvoice === "Done" && (
+                            <Check className="size-4 text-green-600" />
+                          )}
                         </div>
                       </div>
                       <div>
@@ -246,7 +250,9 @@ export default function StudentsPage() {
                         <p
                           className={cn(
                             "mt-1 font-semibold",
-                            student.outstandingAmount === "$0.00" ? "text-green-600" : "text-red-600",
+                            student.outstandingAmount === "$0.00"
+                              ? "text-green-600"
+                              : "text-red-600",
                           )}
                         >
                           {student.outstandingAmount}
@@ -267,11 +273,14 @@ export default function StudentsPage() {
                       <div>
                         <p className="text-gray-500">Course Fee Payment Status</p>
                         <Button
-                          variant={student.courseFeePaymentStatus === "Paid" ? "default" : "outline"}
+                          variant={
+                            student.courseFeePaymentStatus === "Paid" ? "default" : "outline"
+                          }
                           size="sm"
                           className={cn(
                             "mt-1 h-7 text-xs",
-                            student.courseFeePaymentStatus === "Paid" && "bg-green-600 hover:bg-green-700",
+                            student.courseFeePaymentStatus === "Paid" &&
+                              "bg-green-600 hover:bg-green-700",
                           )}
                         >
                           {student.courseFeePaymentStatus}
